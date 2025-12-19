@@ -1,16 +1,17 @@
 'use client';
-import Logo from '@/assets/logo.svg';
+
 import { links } from '@/utils/links';
-import Image from 'next/image';
+
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { usePathname } from 'next/navigation';
+import Logo from './Logo';
 
 const Sidebar = () => {
   const pathname = usePathname();
   return (
     <aside className="h-full px-8 py-4 bg-muted">
-      <Image src={Logo} alt="logo" className="mx-auto" />
+      <Logo />
       <div className="flex flex-col mt-20 gap-y-4">
         {links &&
           links.map((link) => {

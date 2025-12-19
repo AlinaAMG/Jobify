@@ -4,7 +4,7 @@ import { PropsWithChildren } from 'react';
 
 const layout = ({ children }: PropsWithChildren) => {
   return (
-    <main className="grid lg:grid-cols-5">
+    <main className="grid mx-auto max-w-7xl lg:grid-cols-5">
       {/* first-col hide on small screen */}
       <div className="hidden lg:min-h-screen lg:block lg:col-span-1">
         <Sidebar />

@@ -1,15 +1,17 @@
 import { Button } from '@/components/ui/button';
 import { Camera } from 'lucide-react';
 import Image from 'next/image';
-import Logo from '../assets/logo.svg';
+// import Logo from '../assets/logo.svg';
+
 import LandingImg from '../assets/main.svg';
 import Link from 'next/link';
+import Logo from '@/components/Logo';
 
 const HomePage = () => {
   return (
     <main>
       <header className="max-w-6xl px-4 py-6 mx-auto sm:px-6 ">
-        <Image src={Logo} alt="logo" priority />
+        <Logo />
       </header>
       <section className="max-w-6xl mx-auto px-4 sm:px-6 h-screen -mt-20 grid lg:grid-cols-[1fr,400px] items-center">
         <div>
