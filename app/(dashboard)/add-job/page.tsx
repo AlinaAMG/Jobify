@@ -1,11 +1,11 @@
-
+import CreateJobForm from '@/components/CreateJobForm';
 
 const AddJobPage = () => {
   return (
     <div>
-     <h1 className="max-w-5xl pt-4 mx-auto text-5xl">Add Job</h1> 
+      <CreateJobForm />
     </div>
-  )
-}
+  );
+};
 
 export default AddJobPage;
