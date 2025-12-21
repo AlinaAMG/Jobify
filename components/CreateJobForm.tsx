@@ -1,45 +1,69 @@
-"use client";
+'use client';
 
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 
-const formSchema = z.object({
-  username: z.string().min(2, {
-    message: 'Username must be at least 2 characters.',
-  }),
-});
+import {
+  JobStatus,
+  JobMode,
+  createAndEditJobSchema,
+  CreateAndEditJobType,
+} from '@/utils/types';
+
+import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/form';
+
+import { CustomFormField, CustomFormSelect } from './FormComponents';
 
 const CreateJobForm = () => {
-    // Define your form
-   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<CreateAndEditJobType>({
+    resolver: zodResolver(createAndEditJobSchema),
     defaultValues: {
-      username: "",
+      position: '',
+      company: '',
+      location: '',
+      status: JobStatus.Pending,
+      mode: JobMode.FullTime,
     },
-  })
+  });
 
-    // Define a submit handler
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    
+  const onSubmit = (values: CreateAndEditJobType) => {
     console.log(values);
-  }
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        
-        <Button type="submit">Submit</Button>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="p-8 rounded bg-muted"
+      >
+        <h2 className="mb-6 text-4xl font-semibold capitalize">add job</h2>
+        <div className="grid items-start gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {/* POSITION */}
+          <CustomFormField name="position" control={form.control} />
+          {/* COMPANY */}
+          <CustomFormField name="company" control={form.control} />
+          {/* LOCATION */}
+          <CustomFormField name="location" control={form.control} />
+          {/* JOB STATUS  */}
+          <CustomFormSelect
+            name="status"
+            control={form.control}
+            labelText="job status"
+            items={Object.values(JobStatus)}
+          />
+          {/* JOB MODE */}
+
+          <CustomFormSelect
+            name="mode"
+            control={form.control}
+            labelText="job mode"
+            items={Object.values(JobMode)}
+          />
+          <Button type="submit" className="self-end capitalize ">
+            Create job
+          </Button>
+        </div>
       </form>
     </Form>
   );
