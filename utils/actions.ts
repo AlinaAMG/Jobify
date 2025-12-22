@@ -1,7 +1,7 @@
 'use server';
 
-import prisma from './db';
-import { auth } from '@clerk/nextjs';
+import { prisma } from './db';
+import { auth } from '@clerk/nextjs/server';
 import { JobType, CreateAndEditJobType, createAndEditJobSchema } from './types';
 import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
