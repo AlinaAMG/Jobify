@@ -1,11 +1,8 @@
-import { type JobType } from "@/utils/types"
+import { type JobType } from '@/utils/types';
+import { Badge } from '@/components/ui/badge';
 
 const JobCard = ({ job }: { job: JobType }) => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+  return <div>JobCard</div>;
+};
 
-export default JobCard
+export default JobCard;
