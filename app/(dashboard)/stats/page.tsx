@@ -1,11 +1,7 @@
+import { getStatsAction } from '@/utils/actions';
 
-
-const StatsPage = () => {
-  return (
-    <div>
-      Stays
-    </div>
-  )
-}
+const StatsPage = async () => {
+  return <div>Stays</div>;
+};
 
 export default StatsPage;
