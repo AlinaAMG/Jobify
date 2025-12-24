@@ -1,11 +1,13 @@
-
+import { Skeleton } from '@/components/ui/skeleton';
 
 const loading = () => {
   return (
-    <h2 className="text-xl font-medium capitalize">
-      Loading....
-    </h2>
-  )
-}
+    <div className="p-8 grid sm:grid-cols-2 md:grid-cols-3 gap-4 rounded-lg border">
+      <Skeleton className="h-10" />
+      <Skeleton className="h-10" />
+      <Skeleton className="h-10" />
+    </div>
+  );
+};
 
-export default loading
+export default loading;

@@ -201,7 +201,7 @@ export const getChartsDataAction = async (): Promise<
         createdAt: 'asc',
       },
     });
-    console.log(jobs);
+
     let applicationsPerMonth = jobs.reduce((acc, job) => {
       const date = dayjs(job.createdAt).format('MMM YY');
 
