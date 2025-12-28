@@ -12,6 +12,33 @@ import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
 
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+export const analyzeWithGemini = async (jobDescription: string) => {
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+    const prompt = `
+      Jij bent een ATS (Applicant Tracking System) expert. 
+      Analyseer de volgende vacaturetekst: "${jobDescription}". 
+      Geef de volgende informatie terug in duidelijke taal:
+      1. De 5 belangrijkste vaardigheden (keywords) die in het CV moeten staan.
+      2. Een korte samenvatting van wat het bedrijf echt zoekt.
+      3. Eén tip voor het motivatiebrief-gesprek.
+    `;
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    return response.text();
+  } catch (error) {
+    console.error('Gemini Error:', error);
+    return 'Er is iets misgegaan bij het analyseren van de vacature.';
+  }
+};
+
+
 function authenticateAndRedirect(): string {
   const { userId } = auth();
 
