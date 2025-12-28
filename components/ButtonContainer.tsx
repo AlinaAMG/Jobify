@@ -3,7 +3,7 @@
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 
-type ButtonContainerProps = {
+export type ButtonContainerProps = {
   currentPage: number;
   totalPages: number;
 };
@@ -22,7 +22,7 @@ const ButtonContainer = ({ currentPage, totalPages }: ButtonContainerProps) => {
       page: String(page),
     };
       let params = new URLSearchParams(defaultParams);
-      
+
       router.push(`${pathname}? ${params.toString()}`);
   };
 
