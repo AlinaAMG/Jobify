@@ -107,7 +107,7 @@ export const CustomFormTextarea = ({
             <Textarea
               {...field}
               placeholder={placeholder}
-              className="min-h-[200px] resize-none bg-slate-50/50"
+              className="min-h-[400px] resize-none "
             />
           </FormControl>
           <FormMessage />

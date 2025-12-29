@@ -15,12 +15,15 @@ import dayjs from 'dayjs';
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 export const analyzeWithGemini = async (
-  jobDescription: string // Dit is de naam van de parameter
+  jobDescription: string
 ): Promise<AiAnalysisResult> => {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel(
+      { model: 'gemini-1.5-pro' },
+      { apiVersion: 'v1' }
+    );
 
     // Gebruik hier ook jobDescription
     const prompt = `
