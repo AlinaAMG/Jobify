@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
 
 type CustomFormFieldProps = {
   name: string;
@@ -39,25 +40,25 @@ export const CustomFormField = ({ name, control }: CustomFormFieldProps) => {
 };
 
 type CustomFormSelectProps = {
-    name: string;
-    control: Control<any>;
-    items: string[];
-    labelText?: string;
-}
+  name: string;
+  control: Control<any>;
+  items: string[];
+  labelText?: string;
+};
 
 export const CustomFormSelect = ({
   name,
   control,
   items,
   labelText,
-}: CustomFormSelectProps) =>{
+}: CustomFormSelectProps) => {
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className='capitalize'>{labelText || name}</FormLabel>
+          <FormLabel className="capitalize">{labelText || name}</FormLabel>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
               <SelectTrigger>
@@ -80,4 +81,38 @@ export const CustomFormSelect = ({
       )}
     />
   );
-}
+};
+
+type CustomFormTextareaProps = {
+  name: string;
+  control: Control<any>;
+  labelText?: string;
+  placeholder?: string;
+};
+
+export const CustomFormTextarea = ({
+  name,
+  control,
+  labelText,
+  placeholder,
+}: CustomFormTextareaProps) => {
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className="capitalize">{labelText || name}</FormLabel>
+          <FormControl>
+            <Textarea
+              {...field}
+              placeholder={placeholder}
+              className="min-h-[200px] resize-none bg-slate-50/50"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};

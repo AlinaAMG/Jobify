@@ -46,3 +46,9 @@ export type GetAllJobsActionTypes = {
   page?: number;
   limit?: number;
 };
+
+export interface AiAnalysisResult {
+  skills: string[];
+  summary: string;
+  interviewTip: string;
+}

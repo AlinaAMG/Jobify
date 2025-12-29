@@ -7,6 +7,7 @@ import {
   CreateAndEditJobType,
   createAndEditJobSchema,
   GetAllJobsActionTypes,
+  AiAnalysisResult,
 } from './types';
 import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
@@ -16,28 +17,38 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-export const analyzeWithGemini = async (jobDescription: string) => {
+export const analyzeWithGemini = async (
+  jobDescription: string
+): Promise<AiAnalysisResult> => {
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `
-      Jij bent een ATS (Applicant Tracking System) expert. 
-      Analyseer de volgende vacaturetekst: "${jobDescription}". 
-      Geef de volgende informatie terug in duidelijke taal:
-      1. De 5 belangrijkste vaardigheden (keywords) die in het CV moeten staan.
-      2. Een korte samenvatting van wat het bedrijf echt zoekt.
-      3. Eén tip voor het motivatiebrief-gesprek.
+      You are an ATS (Applicant Tracking System) expert and career coach. 
+      Analyze the following job description: "${jobDescription}". 
+      
+      Provide a JSON response with the following structure:
+      {
+        "skills": ["skill1", "skill2", "skill3", "skill4", "skill5"],
+        "summary": "A concise, powerful summary of what the company is truly looking for.",
+        "interviewTip": "One strategic tip for the job interview."
+      }
+      
+      Important: Return ONLY the raw JSON. Do not include markdown formatting, backticks, or any conversational text.
     `;
 
     const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text();
+    const text = result.response.text();
+
+    // Veilig opschonen van de response
+    const cleanedJson = text.replace(/```json|```/g, '').trim();
+
+    return JSON.parse(cleanedJson) as AiAnalysisResult;
   } catch (error) {
     console.error('Gemini Error:', error);
-    return 'Er is iets misgegaan bij het analyseren van de vacature.';
+    throw new Error('Analysis failed');
   }
 };
-
 
 function authenticateAndRedirect(): string {
   const { userId } = auth();

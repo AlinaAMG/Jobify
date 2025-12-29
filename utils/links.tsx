@@ -1,9 +1,9 @@
-import { AppWindow, AreaChart, Layers } from "lucide-react";
+import { AppWindow, AreaChart, Layers, Bot } from 'lucide-react';
 
 type NavLink = {
-    href: string;
-    label: string;
-    icon: React.ReactNode;
+  href: string;
+  label: string;
+  icon: React.ReactNode;
 };
 
 export const links: NavLink[] = [
@@ -21,5 +21,10 @@ export const links: NavLink[] = [
     href: '/stats',
     label: 'stats',
     icon: <AreaChart />,
+  },
+  {
+    href: '/ai-coach',
+    label: 'ai coach',
+    icon: <Bot />,
   },
 ];
