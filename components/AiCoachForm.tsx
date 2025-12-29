@@ -24,6 +24,7 @@ const AiCoachForm = ({ onSubmit, form, isPending }: AiCoachFormProps) => {
           type="submit"
           className="self-end capitalize min-w-[140px]"
           disabled={isPending}
+          size="lg"
         >
           {isPending ? (
             <span className="flex items-center gap-2">Analyseren...</span>
