@@ -59,4 +59,4 @@ export const AiCoachFormSchema = z.object({
       'The job description is too short. Please paste at least 50 characters.',
   }),
 });
-export type FormValues = z.infer<typeof AiCoachFormSchema>;
+export type AiCoachFormValues = z.infer<typeof AiCoachFormSchema>;

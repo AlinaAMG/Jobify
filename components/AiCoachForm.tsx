@@ -1,12 +1,12 @@
 import { Form, UseFormReturn } from 'react-hook-form';
 import { Button } from './ui/button';
 
-import { FormValues } from '@/utils/types';
 import { CustomFormTextarea } from './FormComponents';
+import { AiCoachFormValues } from '@/utils/types';
 
 type AiCoachFormProps = {
-  form: UseFormReturn<FormValues>;
-  onSubmit: (values: FormValues) => void;
+  form: UseFormReturn<AiCoachFormValues>;
+  onSubmit: (values: AiCoachFormValues) => void;
   isPending: boolean;
 };
 
