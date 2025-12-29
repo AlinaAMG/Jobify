@@ -1,9 +1,13 @@
+import AiCoachForm from '@/components/AiCoachForm';
+import AiCoachResult from '@/components/AiCoachResult';
 
-
- const AiCoachPage = () => {
+const AiCoachPage = () => {
   return (
-    <div>page</div>
-  )
-}
+    <>
+      {/* <AiCoachForm onSubmit={handleSubmit} isPending={isPending} />
+     <AiCoachResult/> */}
+    </>
+  );
+};
 
 export default AiCoachPage;

@@ -25,17 +25,17 @@ export enum JobMode {
 }
 
 export const createAndEditJobSchema = z.object({
-    position: z.string().min(2, {
-        message: "position must be at least 2 characters."
-    }),
-    company: z.string().min(2, {
-        message: "company must be at least 2 characters."
-    }),
-    location: z.string().min(2, {
-        message: "location must be at least 2 characters."
-    }),
-    status: z.nativeEnum(JobStatus),
-    mode: z.nativeEnum(JobMode),
+  position: z.string().min(2, {
+    message: 'position must be at least 2 characters.',
+  }),
+  company: z.string().min(2, {
+    message: 'company must be at least 2 characters.',
+  }),
+  location: z.string().min(2, {
+    message: 'location must be at least 2 characters.',
+  }),
+  status: z.nativeEnum(JobStatus),
+  mode: z.nativeEnum(JobMode),
 });
 
 export type CreateAndEditJobType = z.infer<typeof createAndEditJobSchema>;
@@ -47,8 +47,16 @@ export type GetAllJobsActionTypes = {
   limit?: number;
 };
 
-export interface AiAnalysisResult {
+export type AiAnalysisResult = {
   skills: string[];
   summary: string;
   interviewTip: string;
-}
+};
+
+export const AiCoachFormSchema = z.object({
+  description: z.string().min(50, {
+    message:
+      'The job description is too short. Please paste at least 50 characters.',
+  }),
+});
+export type FormValues = z.infer<typeof AiCoachFormSchema>;

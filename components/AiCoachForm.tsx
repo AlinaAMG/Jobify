@@ -1,20 +1,39 @@
-import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Skeleton } from "./ui/skeleton";
-import { Textarea } from "./ui/textarea";
+import { Form, UseFormReturn } from 'react-hook-form';
+import { Button } from './ui/button';
+
+import { FormValues } from '@/utils/types';
+import { CustomFormTextarea } from './FormComponents';
 
 type AiCoachFormProps = {
-    onSubmit: () => void;
-    isAnalyzing: boolean;
-    text: string;
-    setText: (value: string) => void;
+  form: UseFormReturn<FormValues>;
+  onSubmit: (values: FormValues) => void;
+  isPending: boolean;
+};
 
-}
-
- const AiCoachForm = ({onSubmit,isAnalyzing,text,setText}:AiCoachFormProps) => {
+const AiCoachForm = ({ onSubmit, form, isPending }: AiCoachFormProps) => {
   return (
-    <div>AiCoachForm</div>
-  )
-}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <CustomFormTextarea
+          name="description"
+          control={form.control}
+          labelText="Job Description"
+          placeholder="Paste the job requirements or description here..."
+        />
+        <Button
+          type="submit"
+          className="self-end capitalize min-w-[140px]"
+          disabled={isPending}
+        >
+          {isPending ? (
+            <span className="flex items-center gap-2">Analyzing...</span>
+          ) : (
+            'Analyze Job'
+          )}
+        </Button>
+      </form>
+    </Form>
+  );
+};
 
 export default AiCoachForm;
