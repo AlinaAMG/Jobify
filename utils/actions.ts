@@ -13,50 +13,85 @@ import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
+// import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-export const analyzeWithGemini = async (
-  jobDescription: string
-): Promise<AiAnalysisResult> => {
-  try {
-    const model = genAI.getGenerativeModel(
-      { model: 'gemini-1.5-pro' },
-      { apiVersion: 'v1' }
-    );
+// const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
-    // Gebruik hier ook jobDescription
-    const prompt = `
-    Jij bent een ervaren Career Coach. Analyseer de volgende vacaturetekst en geef een strategisch advies in het Nederlands.
+// export const analyzeWithGemini = async (
+//   jobDescription: string
+// ): Promise<AiAnalysisResult> => {
+//   if (!jobDescription) throw new Error('Geen vacaturetekst ontvangen');
+//   try {
+//     const model = genAI.getGenerativeModel(
+//       { model: 'gemini-1.5-flash' },
+//       { apiVersion: 'v1' }
+//     );
+
+//     // Gebruik hier ook jobDescription
+//     const prompt = `
+//     Jij bent een ervaren Career Coach. Analyseer de volgende vacaturetekst en geef een strategisch advies in het Nederlands.
     
-    Vacaturetekst: ${jobDescription} 
+//     Vacaturetekst: ${jobDescription} 
 
-    Reageer ALTIJD in het volgende JSON formaat:
-    {
-      "skills": ["skill 1", "skill 2", "skill 3", "skill 4", "skill 5"],
-      "summary": "Een krachtige samenvatting van de kernmissie van de rol in 1 of 2 zinnen.",
-      "interviewTip": "Een concreet, strategisch advies voor het sollicitatiegesprek."
-    }
+//     Reageer ALTIJD in het volgende JSON formaat:
+//     {
+//       "skills": ["skill 1", "skill 2", "skill 3", "skill 4", "skill 5"],
+//       "summary": "Een krachtige samenvatting van de kernmissie van de rol in 1 of 2 zinnen.",
+//       "interviewTip": "Een concreet, strategisch advies voor het sollicitatiegesprek."
+//     }
 
-    Belangrijk: 
-    - De taal MOET Nederlands zijn.
-    - Geen markdown-opmaak, alleen pure JSON.
-  `;
+//     Belangrijk: 
+//     - De taal MOET Nederlands zijn.
+//     - Geen markdown-opmaak, alleen pure JSON.
+//   `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+//     const result = await model.generateContent(prompt);
+//     const response = result.response;
+//     const text = response.text();
 
-    const cleanJson = text.replace(/```json|```/gi, '').trim();
+//     console.log('RAW AI RESPONSE:', text);
 
-    return JSON.parse(cleanJson) as AiAnalysisResult;
-  } catch (error) {
-    console.error('AI Action Error:', error);
-    // Gooi een duidelijke foutmelding zodat de UI 'Analysis failed' kan tonen
-    throw new Error('Kon de vacature niet analyseren.');
+//     const cleanJson = text.replace(/```json|```/gi, '').trim();
+
+//     try {
+//       return JSON.parse(cleanJson);
+//     } catch (parseError) {
+//       console.error('JSON PARSE FOUT:', cleanJson);
+//       throw new Error('De AI stuurde geen geldig overzicht terug.');
+//     }
+//   } catch (error: any) {
+//     console.error('VOLLEDIGE GOOGLE ERROR:', error);
+//     if (error.message?.includes('429'))
+//       throw new Error('Te veel aanvragen. Wacht even.');
+//     if (error.message?.includes('403'))
+//       throw new Error('API Key rechten probleem (check AI Studio).');
+
+//     throw new Error('Er ging iets mis bij de AI: ' + error.message);
+//   }
+// };
+export const analyzeWithGemini = async (jobDescription: string) => {
+  // 1. Simuleer AI-verwerkingstijd van 2.5 seconden
+ 
+  await new Promise((resolve) => setTimeout(resolve, 2500));
+
+  if (!jobDescription || jobDescription.length < 10) {
+    throw new Error("Voer een geldige vacaturetekst in.");
   }
-};
 
+  return {
+    skills: [
+      "React & Next.js", 
+      "TypeScript", 
+      "Tailwind CSS", 
+      "Zod",
+      "Clerk",
+      "API Integratie", 
+      "UI/UX Design"
+    ],
+    summary: "Deze rol bij een innovatieve startup focust op het bouwen van schaalbare dashboards. Je bent verantwoordelijk voor de volledige frontend lifecycle en werkt nauw samen met backend engineers.",
+    interviewTip: "Bereid je voor op vragen over 'Server Components' en laat zien hoe je de performance van grote datasets in een grid optimaliseert."
+  };
+};
 
 function authenticateAndRedirect(): string {
   const { userId } = auth();

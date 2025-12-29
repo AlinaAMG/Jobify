@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const AiCoachSkeleton = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Top Skills Skeleton */}
+      {/*Skills Skeleton */}
       <Card className="border-none shadow-none bg-slate-50/50">
         <CardHeader>
           <Skeleton className="h-4 w-48" />
@@ -17,7 +17,7 @@ const AiCoachSkeleton = () => {
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Core Mission Skeleton */}
+        {/* missie Skeleton */}
         <Card>
           <CardHeader>
             <Skeleton className="h-4 w-32" />
@@ -28,7 +28,7 @@ const AiCoachSkeleton = () => {
           </CardContent>
         </Card>
 
-        {/* Coach Strategy Skeleton */}
+        {/* Coach Strategie Skeleton */}
         <Card className="bg-slate-900">
           <CardHeader>
             <Skeleton className="h-4 w-40 bg-slate-700" />
