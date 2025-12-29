@@ -20,9 +20,9 @@ const AiCoachResult = ({ data }: AiCoachResultProps) => {
       {/* 1. Key Skills / Keywords Section */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-bold flex items-center gap-2 text-slate-500 uppercase tracking-wider">
+          <CardTitle className="text-sm font-bold flex items-center gap-2  uppercase tracking-wider">
             <Target className="w-4 h-4" />
-            Top Keywords for your CV
+            Belangrijkste trefwoorden voor je CV
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
@@ -45,7 +45,7 @@ const AiCoachResult = ({ data }: AiCoachResultProps) => {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold flex items-center gap-2 text-slate-500 uppercase tracking-wider">
               <Lightbulb className="w-4 h-4" />
-              The Core Mission
+              De Kernmissie
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -60,7 +60,7 @@ const AiCoachResult = ({ data }: AiCoachResultProps) => {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold flex items-center gap-2  uppercase tracking-wider">
               <MessageSquareQuote className="w-4 h-4" />
-              Coach's Strategy
+              Coach Strategie
             </CardTitle>
           </CardHeader>
           <CardContent>

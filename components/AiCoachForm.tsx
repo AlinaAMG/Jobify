@@ -1,8 +1,8 @@
-import { Form, UseFormReturn } from 'react-hook-form';
+import { UseFormReturn } from 'react-hook-form';
 import { Button } from './ui/button';
-
 import { CustomFormTextarea } from './FormComponents';
 import { AiCoachFormValues } from '@/utils/types';
+import { Form } from './ui/form';
 
 type AiCoachFormProps = {
   form: UseFormReturn<AiCoachFormValues>;
@@ -18,7 +18,7 @@ const AiCoachForm = ({ onSubmit, form, isPending }: AiCoachFormProps) => {
           name="description"
           control={form.control}
           labelText="Job Description"
-          placeholder="Paste the job requirements or description here..."
+          placeholder="Plak een vacaturetext hier..."
         />
         <Button
           type="submit"
@@ -26,9 +26,9 @@ const AiCoachForm = ({ onSubmit, form, isPending }: AiCoachFormProps) => {
           disabled={isPending}
         >
           {isPending ? (
-            <span className="flex items-center gap-2">Analyzing...</span>
+            <span className="flex items-center gap-2">Analyseren...</span>
           ) : (
-            'Analyze Job'
+            'Analyseer Vacature'
           )}
         </Button>
       </form>

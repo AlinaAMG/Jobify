@@ -16,39 +16,44 @@ import dayjs from 'dayjs';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-
 export const analyzeWithGemini = async (
-  jobDescription: string
+  jobDescription: string // Dit is de naam van de parameter
 ): Promise<AiAnalysisResult> => {
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
+    // Gebruik hier ook jobDescription
     const prompt = `
-      You are an ATS (Applicant Tracking System) expert and career coach. 
-      Analyze the following job description: "${jobDescription}". 
-      
-      Provide a JSON response with the following structure:
-      {
-        "skills": ["skill1", "skill2", "skill3", "skill4", "skill5"],
-        "summary": "A concise, powerful summary of what the company is truly looking for.",
-        "interviewTip": "One strategic tip for the job interview."
-      }
-      
-      Important: Return ONLY the raw JSON. Do not include markdown formatting, backticks, or any conversational text.
-    `;
+    Jij bent een ervaren Career Coach. Analyseer de volgende vacaturetekst en geef een strategisch advies in het Nederlands.
+    
+    Vacaturetekst: ${jobDescription} 
+
+    Reageer ALTIJD in het volgende JSON formaat:
+    {
+      "skills": ["skill 1", "skill 2", "skill 3", "skill 4", "skill 5"],
+      "summary": "Een krachtige samenvatting van de kernmissie van de rol in 1 of 2 zinnen.",
+      "interviewTip": "Een concreet, strategisch advies voor het sollicitatiegesprek."
+    }
+
+    Belangrijk: 
+    - De taal MOET Nederlands zijn.
+    - Geen markdown-opmaak, alleen pure JSON.
+  `;
 
     const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const response = await result.response;
+    const text = response.text();
 
-    // Veilig opschonen van de response
-    const cleanedJson = text.replace(/```json|```/g, '').trim();
+    const cleanJson = text.replace(/```json|```/gi, '').trim();
 
-    return JSON.parse(cleanedJson) as AiAnalysisResult;
+    return JSON.parse(cleanJson) as AiAnalysisResult;
   } catch (error) {
-    console.error('Gemini Error:', error);
-    throw new Error('Analysis failed');
+    console.error('AI Action Error:', error);
+    // Gooi een duidelijke foutmelding zodat de UI 'Analysis failed' kan tonen
+    throw new Error('Kon de vacature niet analyseren.');
   }
 };
+
 
 function authenticateAndRedirect(): string {
   const { userId } = auth();
