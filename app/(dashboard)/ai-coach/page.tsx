@@ -17,25 +17,27 @@ import { toast } from 'sonner';
 const AiCoachPage = () => {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<AiAnalysisResult | null>(null);
+ const [description, setDescription] = useState('');
 
-  const form = useForm<AiCoachFormValues>({
-    resolver: zodResolver(AiCoachFormSchema),
-    defaultValues: {
-      description: '',
-    },
-  });
-  const handleSubmit = (values: AiCoachFormValues) => {
-    setResult(null);
-    startTransition(async () => {
-      try {
-        const data = await analyzeWithGemini(values.description);
-        setResult(data);
-        toast.success('Analyse voltooid!');
-      } catch (error) {
-        toast.error('Analyse mislukt. Probeer het later opnieuw.');
-      }
-    });
-  };
+ const form = useForm<AiCoachFormValues>({
+   resolver: zodResolver(AiCoachFormSchema),
+   defaultValues: {
+     description: '',
+   },
+ });
+ const handleSubmit = (values: AiCoachFormValues) => {
+   setResult(null);
+   startTransition(async () => {
+     try {
+       const data = await analyzeWithGemini(values.description);
+       setResult(data);
+       toast.success('Analyse voltooid!');
+       form.setValue('description', '');
+     } catch (error) {
+       toast.error('Analyse mislukt. Probeer het later opnieuw.');
+     }
+   });
+ };
 
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-8 space-y-10">
