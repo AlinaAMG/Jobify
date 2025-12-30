@@ -7,90 +7,70 @@ import {
   CreateAndEditJobType,
   createAndEditJobSchema,
   GetAllJobsActionTypes,
-  AiAnalysisResult,
 } from './types';
 import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
 
-// import { GoogleGenerativeAI } from '@google/generative-ai';
-
-// const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-
-// export const analyzeWithGemini = async (
-//   jobDescription: string
-// ): Promise<AiAnalysisResult> => {
-//   if (!jobDescription) throw new Error('Geen vacaturetekst ontvangen');
-//   try {
-//     const model = genAI.getGenerativeModel(
-//       { model: 'gemini-1.5-flash' },
-//       { apiVersion: 'v1' }
-//     );
-
-//     // Gebruik hier ook jobDescription
-//     const prompt = `
-//     Jij bent een ervaren Career Coach. Analyseer de volgende vacaturetekst en geef een strategisch advies in het Nederlands.
-    
-//     Vacaturetekst: ${jobDescription} 
-
-//     Reageer ALTIJD in het volgende JSON formaat:
-//     {
-//       "skills": ["skill 1", "skill 2", "skill 3", "skill 4", "skill 5"],
-//       "summary": "Een krachtige samenvatting van de kernmissie van de rol in 1 of 2 zinnen.",
-//       "interviewTip": "Een concreet, strategisch advies voor het sollicitatiegesprek."
-//     }
-
-//     Belangrijk: 
-//     - De taal MOET Nederlands zijn.
-//     - Geen markdown-opmaak, alleen pure JSON.
-//   `;
-
-//     const result = await model.generateContent(prompt);
-//     const response = result.response;
-//     const text = response.text();
-
-//     console.log('RAW AI RESPONSE:', text);
-
-//     const cleanJson = text.replace(/```json|```/gi, '').trim();
-
-//     try {
-//       return JSON.parse(cleanJson);
-//     } catch (parseError) {
-//       console.error('JSON PARSE FOUT:', cleanJson);
-//       throw new Error('De AI stuurde geen geldig overzicht terug.');
-//     }
-//   } catch (error: any) {
-//     console.error('VOLLEDIGE GOOGLE ERROR:', error);
-//     if (error.message?.includes('429'))
-//       throw new Error('Te veel aanvragen. Wacht even.');
-//     if (error.message?.includes('403'))
-//       throw new Error('API Key rechten probleem (check AI Studio).');
-
-//     throw new Error('Er ging iets mis bij de AI: ' + error.message);
-//   }
-// };
 export const analyzeWithGemini = async (jobDescription: string) => {
-  // 1. Simuleer AI-verwerkingstijd van 2.5 seconden
- 
-  await new Promise((resolve) => setTimeout(resolve, 2500));
+  const apiKey = process.env.OPENROUTER_API_KEY;
 
-  if (!jobDescription || jobDescription.length < 10) {
-    throw new Error("Voer een geldige vacaturetekst in.");
+  if (!apiKey) {
+    throw new Error('OpenRouter API Key ontbreekt in .env.local');
   }
 
-  return {
-    skills: [
-      "React & Next.js", 
-      "TypeScript", 
-      "Tailwind CSS", 
-      "Zod",
-      "Clerk",
-      "API Integratie", 
-      "UI/UX Design"
-    ],
-    summary: "Deze rol bij een innovatieve startup focust op het bouwen van schaalbare dashboards. Je bent verantwoordelijk voor de volledige frontend lifecycle en werkt nauw samen met backend engineers.",
-    interviewTip: "Bereid je voor op vragen over 'Server Components' en laat zien hoe je de performance van grote datasets in een grid optimaliseert."
-  };
+  try {
+    const response = await fetch(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'Jobify AI Coach',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.0-flash-001',
+          messages: [
+            {
+              role: 'system',
+              content:
+                'Je bent een behulpzame carrièrecoach. Antwoord in het Nederlands en geef alleen JSON terug.',
+            },
+            {
+              role: 'user',
+              content: `Analyseer deze vacature: "${jobDescription}". 
+              Geef een JSON object terug met exact deze structuur: 
+              {
+                "skills": ["skill1", "skill2", "skill3", "skill4", "skill5", "skill6"],
+                "summary": "Een krachtige samenvatting van max 5 zinnen",
+                "interviewTip":' Geef een krachtige, psychologische tip die de kandidaat een voorsprong geeft. Focus op een onuitgesproken behoefte in de tekst (bijv. groei, stabiliteit, of eigenaarschap). Geen clichés zoals "wees jezelf", maar een concrete actie of vraag die de kandidaat kan stellen.',
+            }
+              
+             Zorg dat de 'skills' array exact 6 relevante technische of soft-skills bevat die essentieel zijn voor deze rol.,`,
+            },
+          ],
+
+          response_format: { type: 'json_object' },
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('OpenRouter Error:', data);
+      throw new Error(data.error?.message || 'OpenRouter weigert toegang');
+    }
+
+    const content = data.choices[0].message.content;
+    return JSON.parse(content);
+  } catch (error: any) {
+    console.error('Fetch Error:', error.message);
+    throw new Error('AI Analyse mislukt: ' + error.message);
+  }
 };
 
 function authenticateAndRedirect(): string {

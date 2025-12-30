@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 const AiCoachPage = () => {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<AiAnalysisResult | null>(null);
- const [description, setDescription] = useState('');
+
 
  const form = useForm<AiCoachFormValues>({
    resolver: zodResolver(AiCoachFormSchema),
