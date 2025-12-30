@@ -18,25 +18,28 @@ const AiCoachSkeleton = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* missie Skeleton */}
-        <Card>
+        <Card className="h-full min-h-[250px]">
           <CardHeader>
-            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-32 " />
           </CardHeader>
           <CardContent className="space-y-2">
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-4/6" />
+            <Skeleton className="h-4 w-4/6" />
           </CardContent>
         </Card>
 
         {/* Coach Strategie Skeleton */}
-        <Card className="bg-slate-900">
+        <Card className="h-full min-h-[250px]">
           <CardHeader>
-            <Skeleton className="h-4 w-40 bg-slate-700" />
+            <Skeleton className="h-4 w-40" />
           </CardHeader>
           <CardContent className="space-y-2">
-            <Skeleton className="h-4 w-full bg-slate-700" />
-            <Skeleton className="h-4 w-5/6 bg-slate-700" />
-            <Skeleton className="h-4 w-4/6 bg-slate-700" />
+            <Skeleton className="h-4 w-full " />
+            <Skeleton className="h-4 w-5/6 " />
+            <Skeleton className="h-4 w-4/6" />
+            <Skeleton className="h-4 w-4/6" />
           </CardContent>
         </Card>
       </div>
