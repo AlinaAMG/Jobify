@@ -47,8 +47,8 @@ export const analyzeWithGemini = async (jobDescription: string) => {
                 "skills": ["skill1", "skill2", "skill3", "skill4", "skill5", "skill6"],
                 "summary": "Een krachtige samenvatting van max 5 zinnen",
                 "interviewTip":' Geef een krachtige, psychologische tip die de kandidaat een voorsprong geeft. Focus op een onuitgesproken behoefte in de tekst (bijv. groei, stabiliteit, of eigenaarschap). Geen clichés zoals "wees jezelf", maar een concrete actie of vraag die de kandidaat kan stellen.',
-            }
-              
+            },
+               
              Zorg dat de 'skills' array exact 6 relevante technische of soft-skills bevat die essentieel zijn voor deze rol.,`,
             },
           ],
@@ -72,6 +72,8 @@ export const analyzeWithGemini = async (jobDescription: string) => {
     throw new Error('AI Analyse mislukt: ' + error.message);
   }
 };
+
+
 
 function authenticateAndRedirect(): string {
   const { userId } = auth();
