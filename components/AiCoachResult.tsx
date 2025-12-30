@@ -1,4 +1,5 @@
 import { AiAnalysisResult } from '@/utils/types';
+import CoverLetter from '@/components/CoverLetter';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -66,6 +67,7 @@ const AiCoachResult = ({ data }: AiCoachResultProps) => {
           </CardContent>
         </Card>
       </div>
+      <CoverLetter description={data.summary} />
     </div>
   );
 };

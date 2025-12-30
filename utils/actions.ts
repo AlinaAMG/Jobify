@@ -12,6 +12,7 @@ import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
 
+
 export const analyzeWithGemini = async (jobDescription: string) => {
   const apiKey = process.env.OPENROUTER_API_KEY;
 
@@ -27,9 +28,6 @@ export const analyzeWithGemini = async (jobDescription: string) => {
         headers: {
           Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
-
-          'HTTP-Referer': 'http://localhost:3000',
-          'X-Title': 'Jobify AI Coach',
         },
         body: JSON.stringify({
           model: 'google/gemini-2.0-flash-001',
@@ -37,19 +35,28 @@ export const analyzeWithGemini = async (jobDescription: string) => {
             {
               role: 'system',
               content:
-                'Je bent een behulpzame carrièrecoach. Antwoord in het Nederlands en geef alleen JSON terug.',
+                'Je bent een behulpzame carrièrecoach. Antwoord uitsluitend in valide JSON.',
             },
             {
               role: 'user',
-              content: `Analyseer deze vacature: "${jobDescription}". 
+              content: `Analyseer deze vacature: "${jobDescription.replace(
+                /"/g,
+                "'"
+              )}". 
+              
               Geef een JSON object terug met exact deze structuur: 
               {
                 "skills": ["skill1", "skill2", "skill3", "skill4", "skill5", "skill6"],
-                "summary": "Een krachtige samenvatting van max 5 zinnen",
-                "interviewTip":' Geef een krachtige, psychologische tip die de kandidaat een voorsprong geeft. Focus op een onuitgesproken behoefte in de tekst (bijv. groei, stabiliteit, of eigenaarschap). Geen clichés zoals "wees jezelf", maar een concrete actie of vraag die de kandidaat kan stellen.',
-            },
-               
-             Zorg dat de 'skills' array exact 6 relevante technische of soft-skills bevat die essentieel zijn voor deze rol.,`,
+                "summary": "Een krachtige samenvatting van max 5 zinnen.",
+                "interviewTip": "Een psychologische tip zonder clichés.",
+                "coverLetter": "Een brief van 4 paragrafen."
+              }
+
+              Instructies:
+              - De 'skills' array moet exact 6 items bevatten.
+              - De 'interviewTip' moet een concrete actie of vraag zijn die de kandidaat kan stellen.
+              - De 'coverLetter' moet gebaseerd zijn op de gevonden skills en de vacature-inhoud.
+              - Alles moet in het Nederlands.`,
             },
           ],
 
@@ -66,13 +73,15 @@ export const analyzeWithGemini = async (jobDescription: string) => {
     }
 
     const content = data.choices[0].message.content;
-    return JSON.parse(content);
+
+    const cleanJsonString = content.replace(/```json|```/g, '').trim();
+
+    return JSON.parse(cleanJsonString);
   } catch (error: any) {
-    console.error('Fetch Error:', error.message);
+    console.error('Analyse Error:', error.message);
     throw new Error('AI Analyse mislukt: ' + error.message);
   }
 };
-
 
 
 function authenticateAndRedirect(): string {

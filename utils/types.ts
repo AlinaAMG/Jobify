@@ -51,6 +51,7 @@ export type AiAnalysisResult = {
   skills: string[];
   summary: string;
   interviewTip: string;
+  coverLetter: string;
 };
 
 export const AiCoachFormSchema = z.object({
