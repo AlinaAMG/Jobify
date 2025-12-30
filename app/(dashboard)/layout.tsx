@@ -1,3 +1,4 @@
+import ChatAssistant from '@/components/ChatAssistant';
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
 import { PropsWithChildren } from 'react';
@@ -15,6 +16,7 @@ const layout = ({ children }: PropsWithChildren) => {
         <Navbar />
         <div className="px-4 py-16 sm:px-8 lg:px-16">{children}</div>
       </div>
+      <ChatAssistant />
     </main>
   );
 };

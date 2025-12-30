@@ -7,7 +7,7 @@ const AiCoachSkeleton = () => {
       {/*Skills Skeleton */}
       <Card className="border-none shadow-none bg-slate-50/50">
         <CardHeader>
-          <Skeleton className="h-4 w-48" />
+          <Skeleton className="h-4 w-64" />
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           {[1, 2, 3, 4, 5, 6].map((i) => (

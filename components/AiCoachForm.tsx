@@ -13,7 +13,7 @@ type AiCoachFormProps = {
 const AiCoachForm = ({ onSubmit, form, isPending }: AiCoachFormProps) => {
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <CustomFormTextarea
           name="description"
           control={form.control}
@@ -22,7 +22,7 @@ const AiCoachForm = ({ onSubmit, form, isPending }: AiCoachFormProps) => {
         />
         <Button
           type="submit"
-          className="self-end capitalize min-w-[140px]"
+          className="self-end capitalize min-w-[140px] "
           disabled={isPending}
           size="lg"
         >
