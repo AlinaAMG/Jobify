@@ -1,37 +1,73 @@
 'use client';
 
-import { useState } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
+import { useState, useTransition } from 'react';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from './ui/card';
 import { Bot, MessageCircle, Send, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 import { Input } from './ui/input';
-
+import { useUser } from '@clerk/nextjs';
+import { ChatAssistantWithGeminiAction } from '@/utils/actions';
+import { toast } from 'sonner';
 
 const ChatAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const userName = useUser().user?.firstName || 'Gebruiker';
+
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content:
-        'Hoi! Ik ben je AI Coach. Heb je hulp nodig bij je sollicitatie of  bij het schrijven van je solicitaiebrief?',
+      content: `Hoi ${userName}! Welkom op je Jobify dashboard. Hoe kan ik je vandaag helpen met je carrière?`,
     },
   ]);
   const [input, setInput] = useState('');
-
+  const [isPending, startTransition] = useTransition();
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value)
-  }
+    setInput(e.target.value);
+  };
 
-  const handleSend = () => { };
+  const handleSend = () => {
+    if (input.trim() === '' || isPending) return;
+    const userMessage = { role: 'user', content: input };
+    const currentInput = input;
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInput('');
+
+    startTransition(async () => {
+      try {
+        const result = await ChatAssistantWithGeminiAction(
+          messages,
+          currentInput
+        );
+
+        if (result.success) {
+          setMessages((prev) => [
+            ...prev,
+            { role: 'assistant', content: result.content },
+          ]);
+        } else {
+          toast.error('Ai Coach online:' + result.content);
+        }
+      } catch (error) {
+        toast.error('Systeemfout:Probeer het later opnieeuw.');
+      }
+    });
+  };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed z-50 flex flex-col items-end bottom-6 right-6">
       {/* Het Chat Window */}
       {isOpen && (
         <Card className="mb-4 bg-muted w-80 md:w-96 h-[500px] shadow-2xl border border-border flex flex-col animate-in slide-in-from-bottom-5">
-          <CardHeader className="bg-violet-800 text-white rounded-t-xl p-4 flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row items-center justify-between p-4 text-white bg-violet-800 rounded-t-xl">
             <div className="flex items-center gap-2">
               <div className="bg-white/20 p-1.5 rounded-full">
                 <Bot className="w-5 h-5" />
@@ -58,36 +94,70 @@ const ChatAssistant = () => {
           <CardContent className="flex-1 p-4 overflow-hidden">
             <ScrollArea className="h-full pr-4">
               <div className="space-y-4">
-                {messages &&
-                  messages.map((message, index) => (
-                    <div key={index} className="flex justify-end">
-                      <div className="max-w-[80%] p-3 rounded-2xl text-sm bg-violet-600 text-white rounded-tr-none">
+                {messages.map((message, index) => {
+                  const isLastMessage = index === messages.length - 1;
+                  const isAi = message.role === 'assistant';
+
+                  return (
+                    <div
+                      key={index}
+                      className={`flex ${
+                        message.role === 'user'
+                          ? 'justify-end'
+                          : 'justify-start'
+                      }`}
+                    >
+                      <div
+                        className={`max-w-[80%] p-3 rounded-2xl text-sm border shadow-sm transition-all ${
+                          message.role === 'user'
+                            ? 'bg-primary text-primary-foreground rounded-tr-none border-transparent'
+                            : `text-slate-800 rounded-tl-none ${
+                                isLastMessage && isAi
+                                  ? 'animate-highlight-jobify'
+                                  : 'bg-white border-border'
+                              }`
+                        }`}
+                      >
                         {message.content}
                       </div>
                     </div>
-                  ))}
+                  );
+                })}
               </div>
             </ScrollArea>
           </CardContent>
           <CardFooter>
-            <form className="flex w-full gap-2" onSubmit={(e) => {
-              e.preventDefault();
-              handleSend();
-            }}>
-              <Input placeholder="Typ je vraag..." value={input} onChange={handleOnChange} />
+            <form
+              className="flex w-full gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSend();
+              }}
+            >
+              <Input
+                placeholder="Typ je vraag..."
+                value={input}
+                onChange={handleOnChange}
+              />
               <Button type="submit" size="icon" className="bg-primary shrink-0">
-                <Send  className="w-4 h-4" />
+                <Send className="w-4 h-4" />
               </Button>
             </form>
           </CardFooter>
         </Card>
       )}
-      <Button 
+      <Button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-14 h-14 rounded-full shadow-2xl transition-all duration-300 ${isOpen ? 'rotate-90 bg-slate-800 hover:bg-slate-900' : 'bg-primary '}`}
+        className={`w-14 h-14 rounded-full shadow-2xl transition-all duration-300 ${
+          isOpen ? 'rotate-90 bg-violet-900' : 'bg-primary '
+        }`}
         size="icon"
       >
-        {isOpen ? <X className="w-6 h-6 text-white" /> : <MessageCircle className="w-6 h-6 text-white" />}
+        {isOpen ? (
+          <X className="w-6 h-6 text-white" />
+        ) : (
+          <MessageCircle className="w-6 h-6 text-white" />
+        )}
       </Button>
     </div>
   );

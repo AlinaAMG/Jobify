@@ -83,6 +83,56 @@ export const analyzeWithGemini = async (jobDescription: string) => {
   }
 };
 
+export async function ChatAssistantWithGeminiAction(
+  history: { role: string; content: string }[],
+  userInput: string
+) {
+  if (!userInput) return { success: false, content: 'Geen input ontvangen' };
+
+  try {
+    const response = await fetch(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.0-flash-001',
+          messages: [
+            {
+              role: 'system',
+              content:
+                'Jij bent de Jobify AI Coach. Je helpt ingelogde gebruikers op hun dashboard met vragen over de Jobify app, sollicitatietips en carrière-advies.',
+            },
+            ...history.map((msg) => ({
+              role: msg.role,
+              content: msg.content,
+            })),
+            { role: 'user', content: userInput },
+          ],
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error('OpenRouter API fout');
+
+    return {
+      success: true,
+      content: data.choices[0].message.content,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      content: 'Er is een verbindingsfout. Probeer het over een momentje weer.',
+    };
+  }
+}
+
 
 function authenticateAndRedirect(): string {
   const { userId } = auth();

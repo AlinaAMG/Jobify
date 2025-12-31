@@ -16,7 +16,7 @@ const HomePage = () => {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 h-screen -mt-20 grid lg:grid-cols-[1fr,400px] items-center">
         <div>
           <h1 className="text-4xl font-bold capitalize md:text-7xl">
-            Solicitatie <span className="text-primary">Beheersysteem</span> app
+            Sollicitatie <span className="text-primary">Beheersysteem</span> app
           </h1>
           <p className="max-w-md mt-4 leading-loose">
             Maak een einde aan de chaos van losse spreadsheets en e-mails. Met

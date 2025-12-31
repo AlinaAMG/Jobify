@@ -19,10 +19,10 @@ function Providers({ children }: { children: React.ReactNode }) {
       >
         {children}
         <Toaster richColors closeButton />
-          </ThemeProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
+      </ThemeProvider>
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
     </QueryClientProvider>
-  )
+  );
 }
 
 export default Providers;
