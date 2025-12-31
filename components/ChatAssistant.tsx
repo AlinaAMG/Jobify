@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import {
   Card,
   CardContent,
@@ -28,6 +28,19 @@ const ChatAssistant = () => {
   ]);
   const [input, setInput] = useState('');
   const [isPending, startTransition] = useTransition();
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      scrollRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }, 100);
+  };
+
+  // Scroll wanneer er nieuwe berichten zijn OF wanneer de AI aan het laden is
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isPending]);
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -123,6 +136,14 @@ const ChatAssistant = () => {
                     </div>
                   );
                 })}
+                {isPending && (
+                  <div className="flex justify-start">
+                    <div className="p-3 text-xs bg-white border rounded-tl-none border-border rounded-2xl animate-pulse">
+                      Ai Coach typt...
+                    </div>
+                  </div>
+                )}
+                <div ref={scrollRef} className="h-1" />
               </div>
             </ScrollArea>
           </CardContent>
