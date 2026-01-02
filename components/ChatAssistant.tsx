@@ -71,6 +71,11 @@ const ChatAssistant = () => {
   };
 
   const handleClear = () => {
+    if (messages.length <= 1) {
+      toast.info('De chat is al leeg');
+      return;
+    }
+
     if (confirm('Weet je zeker dat je de chat wil wissen?'))
       setMessages([
         {
