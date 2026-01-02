@@ -37,6 +37,7 @@ const ChatWindow = ({
   onToggleExpand,
   isExpanded,
 }: ChatWindowProps) => {
+  const canClear = messages.length > 1;
   return (
     <div>
       {isOpen && (
@@ -63,7 +64,7 @@ const ChatWindow = ({
               </div>
             </div>
             {/* delete btn */}
-            <DeleteChatBtn handleClear={handleClear} />
+            <DeleteChatBtn handleClear={handleClear} isVisible={canClear} />
             {/* toggle btn */}
             <Button
               variant="ghost"

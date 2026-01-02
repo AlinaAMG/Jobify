@@ -34,10 +34,10 @@ function EditJobForm({ jobId }: { jobId: string }) {
       updateJobAction(jobId, values),
     onSuccess: (data) => {
       if (!data) {
-        toast('there was an error');
+        toast('Er is iets misgegaan');
         return;
       }
-      toast('job updated');
+      toast('vacature bijgewerkt');
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
       queryClient.invalidateQueries({ queryKey: ['job', jobId] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
@@ -70,7 +70,9 @@ function EditJobForm({ jobId }: { jobId: string }) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="bg-muted p-8 rounded"
       >
-        <h2 className="capitalize font-semibold text-4xl mb-6">edit job</h2>
+        <h2 className="capitalize font-semibold text-4xl mb-6">
+          Vacature Bijwerken
+        </h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 items-start">
           {/* position */}
           <CustomFormField name="position" control={form.control} />
@@ -99,7 +101,7 @@ function EditJobForm({ jobId }: { jobId: string }) {
             className="self-end capitalize"
             disabled={isPending}
           >
-            {isPending ? 'updating...' : 'edit job'}
+            {isPending ? 'bijwerken...' : 'bewerken '}
           </Button>
         </div>
       </form>

@@ -60,7 +60,9 @@ const CreateJobForm = () => {
         onSubmit={form.handleSubmit(onSubmit)}
         className="p-8 rounded bg-muted"
       >
-        <h2 className="mb-6 text-4xl font-semibold capitalize">add job</h2>
+        <h2 className="mb-6 text-4xl font-semibold capitalize">
+          Vacature Toevoegen
+        </h2>
         <div className="grid items-start gap-4 md:grid-cols-2 lg:grid-cols-3">
           {/* POSITION */}
           <CustomFormField name="position" control={form.control} />
@@ -88,7 +90,7 @@ const CreateJobForm = () => {
             className="self-end capitalize "
             disabled={isPending}
           >
-            {isPending ? 'loading' : 'create job'}
+            {isPending ? 'opslaan' : 'vacature toevoegen'}
           </Button>
         </div>
       </form>

@@ -9,17 +9,17 @@ type NavLink = {
 export const links: NavLink[] = [
   {
     href: '/add-job',
-    label: 'add job',
+    label: 'vacature toevoegen',
     icon: <Layers />,
   },
   {
     href: '/jobs',
-    label: 'jobs',
+    label: 'vacatures',
     icon: <AppWindow />,
   },
   {
     href: '/stats',
-    label: 'stats',
+    label: 'statistieken',
     icon: <AreaChart />,
   },
   {

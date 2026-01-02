@@ -10,18 +10,18 @@ const DeleteJobBtn = ({ id }: { id: string }) => {
     mutationFn: (id: string) => deleteJobAction(id),
     onSuccess: (data) => {
       if (!data) {
-        toast('there was an error');
+        toast('Er is iets misgegaan');
         return;
       }
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
       queryClient.invalidateQueries({ queryKey: ['charts'] });
-      toast('Job Removed');
+      toast('Job Verwijderd');
     },
   });
   return (
     <Button size="sm" disabled={isPending} onClick={() => mutate(id)}>
-      {isPending ? 'deleting...' : 'delete'}
+      {isPending ? 'bezig...' : 'verwijderen'}
     </Button>
   );
 };

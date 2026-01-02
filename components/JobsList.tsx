@@ -63,7 +63,9 @@ const JobsList = () => {
       <>
         {/* De Header blijft staan voor de structuur */}
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-xl font-semibold capitalize">No jobs found</h2>
+          <h2 className="text-xl font-semibold capitalize">
+            Geen vacatures gevonden
+          </h2>
         </div>
 
         {/* We tonen de skeletons om de layout te vullen */}
@@ -85,9 +87,11 @@ const JobsList = () => {
                 <SearchX className="w-10 h-10" />
               </Button>
 
-              <h2 className="text-xl font-semibold">No jobs found...</h2>
+              <h2 className="text-xl font-semibold">
+                Geen vacatures gevonden ...
+              </h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Click the icon to clear all filters
+                Klik op het icoon om alle filters te wissen
               </p>
             </div>
           </div>
@@ -100,7 +104,7 @@ const JobsList = () => {
     <>
       <div className="flex flex-col md:flex-row  items-center justify-between mb-8">
         <h2 className="text-xl mb-3  md:mb-0 font-semibold capitalize">
-          {count} jobs found
+          {count} vacatures gevonden
         </h2>
         {totalPages > 2 && (
           <ComplexButtonContainer currentPage={page} totalPages={totalPages} />

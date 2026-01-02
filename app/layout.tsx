@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Jobify',
   description:
-    'The ultimate dashboard to track your job hunt. Organize applications, manage company details, and keep your career search up to date in real-time.',
+    "Beheer je volledige carrière-zoektocht vanuit één centraal dashboard. Organiseer vacatures, beheer contactgegevens en blijf altijd up-to-date met je sollicitaties.",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" suppressHydrationWarning className={inter.className}>
+      <html lang="nl" suppressHydrationWarning className={inter.className}>
         <body>
           <Providers>{children}</Providers>
         </body>

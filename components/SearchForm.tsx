@@ -35,7 +35,12 @@ const SearchForm = () => {
       onSubmit={handleSubmit}
       className="grid gap-4 p-8 mb-16 rounded-lg bg-muted sm:grid-cols-2 md:grid-cols-3"
     >
-      <Input type="text" placeholder="Search Jobs" defaultValue={search} name="search" />
+      <Input
+        type="text"
+        placeholder="Zoek vacatures"
+        defaultValue={search}
+        name="search"
+      />
       <Select name="jobStatus" defaultValue={jobStatus}>
         <SelectTrigger>
           <SelectValue />
@@ -50,7 +55,7 @@ const SearchForm = () => {
           })}
         </SelectContent>
       </Select>
-      <Button type="submit">Search</Button>
+      <Button type="submit">Zoeken</Button>
     </form>
   );
 };

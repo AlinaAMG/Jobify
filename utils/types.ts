@@ -56,8 +56,7 @@ export type AiAnalysisResult = {
 
 export const AiCoachFormSchema = z.object({
   description: z.string().min(50, {
-    message:
-      'The job description is too short. Please paste at least 50 characters.',
+    message: 'De vacatureomschrijving is te kort. Voeg minimaal 50 tekens toe.',
   }),
 });
 export type AiCoachFormValues = z.infer<typeof AiCoachFormSchema>;

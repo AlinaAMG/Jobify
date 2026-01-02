@@ -1,8 +1,6 @@
 import { Button } from '@/components/ui/button';
 
 import Image from 'next/image';
-// import Logo from '../assets/logo.svg';
-
 import LandingImg from '../assets/main.svg';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
@@ -26,7 +24,7 @@ const HomePage = () => {
             Jouw droombaan verdient een gestructureerde aanpak.
           </p>
           <Button asChild className="font-bold mt-7" size="lg">
-            <Link href="/add-job">Get Started</Link>
+            <Link href="/add-job">Aan de slag</Link>
           </Button>
         </div>
         <Image

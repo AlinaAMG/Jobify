@@ -12,9 +12,9 @@ const StatsContainer = () => {
 
   return (
     <div className="grid md:grid-cols-2 gap-4 lg:grid-cols-3">
-      <StatsCard title="pending jobs" value={data?.pending || 0} />
-      <StatsCard title="interviews set" value={data?.interview || 0} />
-      <StatsCard title="jobs declined" value={data?.declined || 0} />
+      <StatsCard title="Lopende vacatures" value={data?.pending || 0} />
+      <StatsCard title="Gesprekken gepland" value={data?.interview || 0} />
+      <StatsCard title="Afgewezen" value={data?.declined || 0} />
     </div>
   );
 };
