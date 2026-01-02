@@ -15,6 +15,7 @@ import { Input } from './ui/input';
 import { useUser } from '@clerk/nextjs';
 import { ChatAssistantWithGeminiAction } from '@/utils/actions';
 import { toast } from 'sonner';
+import DeleteChatBtn from './DeleteChatBtn';
 
 const ChatAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -75,6 +76,16 @@ const ChatAssistant = () => {
     });
   };
 
+  const handleClear = () => {
+    if (confirm('Weet je zeker dat je de chat wil wissen?'))
+      setMessages([
+        {
+          role: 'assistant',
+          content: `Hoi ${userName}! De chat is gewist.Hoe kan ik je opnieuw helpen?`,
+        },
+      ]);
+  };
+
   return (
     <div className="fixed z-50 flex flex-col items-end bottom-6 right-6">
       {/* Het Chat Window */}
@@ -95,6 +106,7 @@ const ChatAssistant = () => {
                 </span>
               </div>
             </div>
+            <DeleteChatBtn handleClear={handleClear} />
             <Button
               variant="default"
               size="icon"
