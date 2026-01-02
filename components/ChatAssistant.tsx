@@ -1,27 +1,16 @@
 'use client';
 
 import { useEffect, useRef, useState, useTransition } from 'react';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from './ui/card';
-import { Bot, MessageCircle, Send, X } from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
 import { useUser } from '@clerk/nextjs';
 import { ChatAssistantWithGeminiAction } from '@/utils/actions';
 import { toast } from 'sonner';
-import DeleteChatBtn from './DeleteChatBtn';
-import AiMessageList from './AiMessageList';
-import AiFormChat from './AiFormChat';
 import ChatWindow from './ChatWindow';
+import AiChatBtn from './AiChatBtn';
 
 const ChatAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
   const userName = useUser().user?.firstName || 'Gebruiker';
+  const [iseExpanded, setIsExpanded] = useState(false);
 
   const [messages, setMessages] = useState([
     {
@@ -33,6 +22,10 @@ const ChatAssistant = () => {
   const [isPending, startTransition] = useTransition();
 
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const onToggleExpand = () => {
+    setIsExpanded(!iseExpanded);
+  };
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -100,21 +93,10 @@ const ChatAssistant = () => {
         setIsOpen={setIsOpen}
         scrollRef={scrollRef}
         isOpen={isOpen}
+        onToggleExpand={onToggleExpand}
+        isExpanded={iseExpanded}
       />
-
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-14 h-14 rounded-full shadow-2xl transition-all duration-300 ${
-          isOpen ? 'rotate-90 bg-violet-900' : 'bg-primary '
-        }`}
-        size="icon"
-      >
-        {isOpen ? (
-          <X className="w-6 h-6 text-white" />
-        ) : (
-          <MessageCircle className="w-6 h-6 text-white" />
-        )}
-      </Button>
+      <AiChatBtn isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>
   );
 };
