@@ -11,76 +11,112 @@ import {
 import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
+import { callAI } from './ai-service';
 
+// export const analyzeWithGemini = async (jobDescription: string) => {
+//   const apiKey = process.env.OPENROUTER_API_KEY;
 
-export const analyzeWithGemini = async (jobDescription: string) => {
-  const apiKey = process.env.OPENROUTER_API_KEY;
+//   if (!apiKey) {
+//     throw new Error('OpenRouter API Key ontbreekt in .env.local');
+//   }
 
-  if (!apiKey) {
-    throw new Error('OpenRouter API Key ontbreekt in .env.local');
-  }
+//   try {
+//     const response = await fetch(
+//       'https://openrouter.ai/api/v1/chat/completions',
+//       {
+//         method: 'POST',
+//         headers: {
+//           Authorization: `Bearer ${apiKey}`,
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           model: 'google/gemini-2.0-flash-001',
+//           messages: [
+//             {
+//               role: 'system',
+//               content:
+//                 'Je bent een behulpzame carrièrecoach. Antwoord uitsluitend in valide JSON.',
+//             },
+//             {
+//               role: 'user',
+//               content: `Analyseer deze vacature: "${jobDescription.replace(
+//                 /"/g,
+//                 "'"
+//               )}".
 
-  try {
-    const response = await fetch(
-      'https://openrouter.ai/api/v1/chat/completions',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-2.0-flash-001',
-          messages: [
-            {
-              role: 'system',
-              content:
-                'Je bent een behulpzame carrièrecoach. Antwoord uitsluitend in valide JSON.',
-            },
-            {
-              role: 'user',
-              content: `Analyseer deze vacature: "${jobDescription.replace(
-                /"/g,
-                "'"
-              )}". 
-              
-              Geef een JSON object terug met exact deze structuur: 
-              {
-                "skills": ["skill1", "skill2", "skill3", "skill4", "skill5", "skill6"],
-                "summary": "Een krachtige samenvatting van max 5 zinnen.",
-                "interviewTip": "Een psychologische tip zonder clichés.",
-                "coverLetter": "Een brief van 4 paragrafen."
-              }
+//               Geef een JSON object terug met exact deze structuur:
+//               {
+//                 "skills": ["skill1", "skill2", "skill3", "skill4", "skill5", "skill6"],
+//                 "summary": "Een krachtige samenvatting van max 5 zinnen.",
+//                 "interviewTip": "Een psychologische tip zonder clichés.",
+//                 "coverLetter": "Een brief van 4 paragrafen."
+//               }
 
-              Instructies:
-              - De 'skills' array moet exact 6 items bevatten.
-              - De 'interviewTip' moet een concrete actie of vraag zijn die de kandidaat kan stellen.
-              - De 'coverLetter' moet gebaseerd zijn op de gevonden skills en de vacature-inhoud.
-              - Alles moet in het Nederlands.`,
-            },
-          ],
+//               Instructies:
+//               - De 'skills' array moet exact 6 items bevatten.
+//               - De 'interviewTip' moet een concrete actie of vraag zijn die de kandidaat kan stellen.
+//               - De 'coverLetter' moet gebaseerd zijn op de gevonden skills en de vacature-inhoud.
+//               - Alles moet in het Nederlands.`,
+//             },
+//           ],
 
-          response_format: { type: 'json_object' },
-        }),
-      }
-    );
+//           response_format: { type: 'json_object' },
+//         }),
+//       }
+//     );
 
-    const data = await response.json();
+//     const data = await response.json();
 
-    if (!response.ok) {
-      console.error('OpenRouter Error:', data);
-      throw new Error(data.error?.message || 'OpenRouter weigert toegang');
-    }
+//     if (!response.ok) {
+//       console.error('OpenRouter Error:', data);
+//       throw new Error(data.error?.message || 'OpenRouter weigert toegang');
+//     }
 
-    const content = data.choices[0].message.content;
+//     const content = data.choices[0].message.content;
 
-    const cleanJsonString = content.replace(/```json|```/g, '').trim();
+//     const cleanJsonString = content.replace(/```json|```/g, '').trim();
 
-    return JSON.parse(cleanJsonString);
-  } catch (error: any) {
-    console.error('Analyse Error:', error.message);
-    throw new Error('AI Analyse mislukt: ' + error.message);
-  }
+//     return JSON.parse(cleanJsonString);
+//   } catch (error: any) {
+//     console.error('Analyse Error:', error.message);
+//     throw new Error('AI Analyse mislukt: ' + error.message);
+//   }
+// };
+
+export const analyzeJobWithGemini = async (description: string) => {
+  const prompt = `Analyseer deze vacature: "${description}". 
+  Geef JSON terug met: 
+  "skills": een lijst van de 6 belangrijkste vaardigheden, 
+    "summary": een krachtige samenvatting van max 5 zinnen, 
+    "interviewTip": een concreet strategisch advies voor het gesprek.
+    "matchScore": een getal tussen 0 en 100 dat aangeeft hoe goed een gemiddelde kandidaat met de gevraagde skills zou matchen,
+    
+    BELANGRIJK: Alles moet in het Nederlands geschreven zijn.`;
+
+  return await callAI('google/gemini-2.0-flash-001', [
+    { role: 'system', content: 'Je bent een carrièrecoach. Antwoord in JSON.' },
+    { role: 'user', content: prompt },
+  ]);
+};
+
+export const generateCoverLetterWithClaude = async (
+  description: string,
+  skills: string[]
+) => {
+  const prompt = `Schrijf een professionele en overtuigende sollicitatiebrief voor de volgende vacature: "${description}". 
+    Focus specifiek op deze vaardigheden: ${skills.join(', ')}. 
+    
+    GEEF JSON TERUG: { "coverLetter": "de volledige tekst van de brief" }.
+    
+    BELANGRIJK: De brief moet in foutloos Nederlands geschreven zijn, met een professionele maar enthousiaste toon.`;
+
+  return await callAI('anthropic/claude-3-5-haiku', [
+    {
+      role: 'system',
+      content: 'Je bent een professionele copywriter. Antwoord in JSON.',
+    },
+    { role: 'user', content: prompt },
+  ]);
 };
 
 export async function ChatAssistantWithGeminiAction(

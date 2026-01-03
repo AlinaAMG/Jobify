@@ -1,6 +1,6 @@
 'use client';
 
-import { analyzeWithGemini } from '@/utils/actions';
+import { generateCoverLetterWithClaude } from '@/utils/actions';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
@@ -10,9 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 type CoverLetterProps = {
   description: string;
+  skills: string[];
 };
 
-const CoverLetter = ({ description }: CoverLetterProps) => {
+const CoverLetter = ({ description, skills }: CoverLetterProps) => {
   const [showLetter, setShowLetter] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [aiResult, setAiResult] = useState<AiAnalysisResult | null>(null);
@@ -23,10 +24,10 @@ const CoverLetter = ({ description }: CoverLetterProps) => {
     }
     startTransition(async () => {
       try {
-        const result = await analyzeWithGemini(description);
+        const result = await generateCoverLetterWithClaude(description, skills);
 
         setAiResult(result);
-        toast.success('Analyse succesvol afgerond!');
+        toast.success('Brief succesvol geschreven!');
       } catch (error) {
         toast.error('Ai error tijdens  het ophalen van data....');
       }
@@ -61,10 +62,10 @@ const CoverLetter = ({ description }: CoverLetterProps) => {
         <Card className="w-full border-indigo-200 shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-500">
           <CardHeader className="flex flex-row items-center justify-between border-b border-indigo-50 bg-indigo-50/30">
             <div>
-              <CardTitle className="text-xl font-bold text-indigo-900">
+              <CardTitle className="text-xl font-bold text-indigo-800">
                 Jouw Sollicitatiebrief
               </CardTitle>
-              <p className="text-sm text-slate-500 italic">
+              <p className="text-sm text-slate-500 italic dark:text-slate-100">
                 Gegenereerd door AI Coach
               </p>
             </div>
@@ -76,7 +77,7 @@ const CoverLetter = ({ description }: CoverLetterProps) => {
                   navigator.clipboard.writeText(aiResult.coverLetter);
                   toast.success('Brief Gekopieerd!');
                 }}
-                className=" h-9"
+                className=" h-9 bg-indigo-50 text-indigo-700 dark:hover:bg-primary"
               >
                 <Copy className="w-4 h-4 mr-2" /> Kopiëren
               </Button>
@@ -84,9 +85,9 @@ const CoverLetter = ({ description }: CoverLetterProps) => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowLetter(false)}
-                className="h-9 text-slate-500  hover:bg-red-50 flex items-center gap-2"
+                className="h-9 bg-indigo-50 text-indigo-700 dark:hover:bg-primary flex items-center gap-2 "
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4 " />
                 Verbergen
               </Button>
             </div>

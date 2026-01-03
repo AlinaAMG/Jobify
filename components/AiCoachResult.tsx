@@ -31,7 +31,7 @@ const AiCoachResult = ({ data }: AiCoachResultProps) => {
             <Badge
               key={skill}
               variant="secondary"
-              className="bg-indigo-50 text-indigo-700 cursor-pointer border-indigo-100 px-3 py-1"
+              className="bg-indigo-50 text-indigo-700 dark:hover:bg-primary cursor-pointer border-indigo-100 px-3 py-1"
             >
               <CheckCircle2 className="w-3 h-3 mr-1 opacity-70" />
               {skill}
@@ -50,7 +50,7 @@ const AiCoachResult = ({ data }: AiCoachResultProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="leading-relaxed font-medium">"{data.summary}"</p>
+            <p className="leading-relaxed font-medium">{data.summary}</p>
           </CardContent>
         </Card>
 
@@ -67,7 +67,7 @@ const AiCoachResult = ({ data }: AiCoachResultProps) => {
           </CardContent>
         </Card>
       </div>
-      <CoverLetter description={data.summary} />
+      <CoverLetter description={data.summary} skills={data.skills} />
     </div>
   );
 };

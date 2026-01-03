@@ -3,7 +3,7 @@
 import AiCoachForm from '@/components/AiCoachForm';
 import AiCoachResult from '@/components/AiCoachResult';
 import AiCoachSkeleton from '@/components/AiCoachSkeleton';
-import { analyzeWithGemini } from '@/utils/actions';
+import { analyzeJobWithGemini } from '@/utils/actions';
 import {
   AiAnalysisResult,
   AiCoachFormSchema,
@@ -18,26 +18,25 @@ const AiCoachPage = () => {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<AiAnalysisResult | null>(null);
 
-
- const form = useForm<AiCoachFormValues>({
-   resolver: zodResolver(AiCoachFormSchema),
-   defaultValues: {
-     description: '',
-   },
- });
- const handleSubmit = (values: AiCoachFormValues) => {
-   setResult(null);
-   startTransition(async () => {
-     try {
-       const data = await analyzeWithGemini(values.description);
-       setResult(data);
-       toast.success('Analyse voltooid!');
-       form.setValue('description', '');
-     } catch (error) {
-       toast.error('Analyse mislukt. Probeer het later opnieuw.');
-     }
-   });
- };
+  const form = useForm<AiCoachFormValues>({
+    resolver: zodResolver(AiCoachFormSchema),
+    defaultValues: {
+      description: '',
+    },
+  });
+  const handleSubmit = (values: AiCoachFormValues) => {
+    setResult(null);
+    startTransition(async () => {
+      try {
+        const data = await analyzeJobWithGemini(values.description);
+        setResult(data);
+        toast.success('Analyse voltooid!');
+        form.setValue('description', '');
+      } catch (error) {
+        toast.error('Analyse mislukt. Probeer het later opnieuw.');
+      }
+    });
+  };
 
   return (
     <div className=" mx-auto p-4 sm:p-8 space-y-10 bg-muted rounded">
