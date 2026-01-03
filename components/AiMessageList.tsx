@@ -29,11 +29,11 @@ const AiMessageList = ({
                 className={`max-w-[80%] p-3 rounded-2xl text-sm border shadow-sm transition-all ${
                   message.role === 'user'
                     ? 'bg-primary text-primary-foreground rounded-tr-none border-transparent'
-                    : `text-slate-800 rounded-tl-none ${
+                    : ` rounded-tl-none ${
                         isLastMessage && isAi
                           ? 'animate-highlight-jobify'
-                          : 'bg-white border-border'
-                      }`
+                          : ' dark:bg-slate-700 border-border'
+                      }text-slate-800 dark:text-slate-100 `
                 }`}
               >
                 {message.content}
@@ -43,7 +43,7 @@ const AiMessageList = ({
         })}
         {isPending && (
           <div className="flex justify-start">
-            <div className="p-3 text-xs bg-white border rounded-tl-none border-border rounded-2xl animate-pulse">
+            <div className="p-3 text-xs bg-white dark:bg-slate-700 border rounded-tl-none border-border rounded-2xl animate-pulse">
               Ai Coach typt...
             </div>
           </div>

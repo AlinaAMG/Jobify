@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
@@ -14,23 +14,22 @@ const config: Config = {
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       keyframes: {
-        'fade-to-white': {
-          // Begint bij een hele lichte versie van jouw paars
+        'highlight-fade': {
           '0%': {
-            backgroundColor: 'hsl(265 89% 95%)',
-            borderColor: 'hsl(265 89% 80%)',
+            backgroundColor: 'hsl(265 89% 80% / 0.2)',
+            borderColor: 'hsl(265 89% 70%)',
           },
           '100%': {
-            backgroundColor: '#ffffff',
+            backgroundColor: 'transparent',
             borderColor: 'hsl(var(--border))',
           },
         },
       },
       animation: {
-        'highlight-jobify': 'fade-to-white 4s ease-in-out forwards',
+        'highlight-jobify': 'highlight-fade 4s ease-in-out forwards',
       },
     },
   },
   plugins: [],
 };
-export default config
+export default config;

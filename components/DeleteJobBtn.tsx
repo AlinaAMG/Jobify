@@ -21,7 +21,7 @@ const DeleteJobBtn = ({ id }: { id: string }) => {
   });
   return (
     <Button size="sm" disabled={isPending} onClick={() => mutate(id)}>
-      {isPending ? 'bezig...' : 'verwijderen'}
+      {isPending ? 'Bezig...' : 'Verwijderen'}
     </Button>
   );
 };
