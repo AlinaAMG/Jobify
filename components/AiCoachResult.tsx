@@ -8,6 +8,7 @@ import {
   MessageSquareQuote,
   CheckCircle2,
 } from 'lucide-react';
+import MatchScore from './MatchScore';
 
 type AiCoachResultProps = {
   data: AiAnalysisResult | null;
@@ -17,7 +18,7 @@ const AiCoachResult = ({ data }: AiCoachResultProps) => {
   if (!data) return null;
 
   return (
-    <div className="grid gap-6 mt-8 animate-in fade-in">
+    <div className="grid  gap-6 mt-8 animate-in fade-in">
       {/* 1. Key Skills / Keywords Section */}
       <Card>
         <CardHeader className="pb-3">
@@ -40,8 +41,13 @@ const AiCoachResult = ({ data }: AiCoachResultProps) => {
         </CardContent>
       </Card>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* 2. The Core Mission Section */}
+      {/*2. Match Score sectie */}
+      <div className="md:col-span-1">
+        <MatchScore score={data.matchScore || 85} />
+      </div>
+
+      {/* 3. De kernmissie Sectie */}
+      <div className="grid md:grid-cols-2 gap-3">
         <Card className="border-slate-200">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold flex items-center gap-2 text-slate-500 uppercase tracking-wider">
@@ -54,7 +60,7 @@ const AiCoachResult = ({ data }: AiCoachResultProps) => {
           </CardContent>
         </Card>
 
-        {/* 3. Coach's Strategy Section */}
+        {/* 4. Coach's Strategy Section */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold flex items-center gap-2  uppercase tracking-wider text-slate-500">
@@ -67,6 +73,7 @@ const AiCoachResult = ({ data }: AiCoachResultProps) => {
           </CardContent>
         </Card>
       </div>
+
       <CoverLetter description={data.summary} skills={data.skills} />
     </div>
   );

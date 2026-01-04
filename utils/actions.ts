@@ -99,7 +99,7 @@ export const analyzeJobWithGemini = async (description: string) => {
   ]);
 };
 
-export const generateCoverLetterWithClaude = async (
+export const generateCoverLetterWithGemini = async (
   description: string,
   skills: string[]
 ) => {
@@ -110,7 +110,7 @@ export const generateCoverLetterWithClaude = async (
     
     BELANGRIJK: De brief moet in foutloos Nederlands geschreven zijn, met een professionele maar enthousiaste toon.`;
 
-  return await callAI('anthropic/claude-3-5-haiku', [
+  return await callAI('google/gemini-2.0-flash-001', [
     {
       role: 'system',
       content: 'Je bent een professionele copywriter. Antwoord in JSON.',

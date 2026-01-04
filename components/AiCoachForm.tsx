@@ -29,7 +29,7 @@ const AiCoachForm = ({ onSubmit, form, isPending }: AiCoachFormProps) => {
           {isPending ? (
             <span className="flex items-center gap-2">Analyseren...</span>
           ) : (
-            'Analyseer Vacature'
+            'Start Ai Analyse & Match'
           )}
         </Button>
       </form>

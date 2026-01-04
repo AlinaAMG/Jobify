@@ -1,6 +1,6 @@
 'use client';
 
-import { generateCoverLetterWithClaude } from '@/utils/actions';
+import { generateCoverLetterWithGemini } from '@/utils/actions';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
@@ -24,7 +24,7 @@ const CoverLetter = ({ description, skills }: CoverLetterProps) => {
     }
     startTransition(async () => {
       try {
-        const result = await generateCoverLetterWithClaude(description, skills);
+        const result = await generateCoverLetterWithGemini(description, skills);
 
         setAiResult(result);
         toast.success('Brief succesvol geschreven!');
