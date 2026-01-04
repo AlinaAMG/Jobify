@@ -53,11 +53,17 @@ export type AiAnalysisResult = {
   interviewTip: string;
   coverLetter: string;
   matchScore: number;
+  resume: string;
+  matchingSkills: string[];
+  missingSkills: string[];
 };
 
 export const AiCoachFormSchema = z.object({
   description: z.string().min(50, {
     message: 'De vacatureomschrijving is te kort. Voeg minimaal 50 tekens toe.',
+  }),
+  resume: z.string().min(20, {
+    message: 'De cv text is te kort.Voeg minimaal 20 tekens toe.',
   }),
 });
 export type AiCoachFormValues = z.infer<typeof AiCoachFormSchema>;

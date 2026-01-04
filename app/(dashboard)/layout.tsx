@@ -1,4 +1,4 @@
-import ChatAssistant from '@/components/ChatAssistant';
+import ChatAssistant from '@/components/ai/ChatAssistant';
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
 import { PropsWithChildren } from 'react';

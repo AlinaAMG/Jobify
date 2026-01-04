@@ -1,6 +1,6 @@
 import { Send } from "lucide-react";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 type AiFormChatProps = {
     handleSend: () => void;

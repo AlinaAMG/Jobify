@@ -1,9 +1,9 @@
 'use client';
 
-import AiCoachForm from '@/components/AiCoachForm';
-import AiCoachResult from '@/components/AiCoachResult';
-import AiCoachSkeleton from '@/components/AiCoachSkeleton';
-import { analyzeJobWithGemini } from '@/utils/actions';
+import AiCoachForm from '@/components/ai/AiCoachForm';
+import AiCoachResult from '@/components/ai/AiCoachResult';
+import AiCoachSkeleton from '@/components/ai/AiCoachSkeleton';
+import { analyzeJobAndCvWithGemini } from '@/utils/actions';
 import {
   AiAnalysisResult,
   AiCoachFormSchema,
@@ -22,13 +22,17 @@ const AiCoachPage = () => {
     resolver: zodResolver(AiCoachFormSchema),
     defaultValues: {
       description: '',
+      resume: '',
     },
   });
   const handleSubmit = (values: AiCoachFormValues) => {
     setResult(null);
     startTransition(async () => {
       try {
-        const data = await analyzeJobWithGemini(values.description);
+        const data = await analyzeJobAndCvWithGemini(
+          values.description,
+          values.resume
+        );
         setResult(data);
         toast.success('Analyse voltooid!');
         form.setValue('description', '');

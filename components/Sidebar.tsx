@@ -12,7 +12,7 @@ const Sidebar = () => {
   return (
     <aside className="h-full px-8 py-4 bg-muted ">
       <Logo />
-      <div className="flex flex-col mt-20 gap-y-4 sticky top-20">
+      <div className="flex flex-col mt-20 gap-y-4 sticky top-20 ">
         {links &&
           links.map((link) => {
             return (
@@ -23,7 +23,9 @@ const Sidebar = () => {
               >
                 <Link href={link.href} className="flex items-center gap-x-2 ">
                   {link.icon}
-                  <span className="capitalize">{link.label}</span>
+                  <span className="capitalize dark:text-slate-200">
+                    {link.label}
+                  </span>
                 </Link>
               </Button>
             );

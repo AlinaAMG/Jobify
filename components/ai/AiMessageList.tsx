@@ -1,4 +1,4 @@
-import { ScrollArea } from './ui/scroll-area';
+import { ScrollArea } from '../ui/scroll-area';
 
 type AiMessageListProps = {
   messages: { role: string; content: string }[];

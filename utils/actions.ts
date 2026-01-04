@@ -83,13 +83,29 @@ import { callAI } from './ai-service';
 //   }
 // };
 
-export const analyzeJobWithGemini = async (description: string) => {
-  const prompt = `Analyseer deze vacature: "${description}". 
-  Geef JSON terug met: 
-  "skills": een lijst van de 6 belangrijkste vaardigheden, 
-    "summary": een krachtige samenvatting van max 5 zinnen, 
-    "interviewTip": een concreet strategisch advies voor het gesprek.
-    "matchScore": een getal tussen 0 en 100 dat aangeeft hoe goed een gemiddelde kandidaat met de gevraagde skills zou matchen,
+export const analyzeJobAndCvWithGemini = async (
+  description: string,
+  resume: string
+) => {
+  const prompt = `
+  Context:
+Ik ben een sollicitant. Hieronder vind je twee teksten:
+1. De VACATURETEKST waar ik op wil solliciteren.
+2. Mijn eigen CV (ERVARING).
+
+VACATURE: "${description}"
+MIJN CV: "${resume}" 
+  Opdracht:
+
+Voer een diepe analyse uit. Vergelijk mijn skills met de eisen van de vacature. 
+Geef een JSON object terug met:
+- "matchScore": een getal tussen 0-100 (wees eerlijk!).
+- "skills": de 6 belangrijkste keywords uit de vacature.
+- "summary": een korte conclusie over de match.
+- "interviewTip": waar moet ik op letten in het gesprek gezien mijn CV?
+- "matchingSkills": welke skills uit mijn CV sluiten aan?
+- "missingSkills": welke belangrijke skills uit de vacature heb ik nog niet?
+
     
     BELANGRIJK: Alles moet in het Nederlands geschreven zijn.`;
 

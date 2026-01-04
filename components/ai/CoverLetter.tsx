@@ -3,10 +3,10 @@
 import { generateCoverLetterWithGemini } from '@/utils/actions';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 import { AiAnalysisResult } from '@/utils/types';
 import { Copy, FileText, Loader, X } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 type CoverLetterProps = {
   description: string;

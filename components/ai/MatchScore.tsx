@@ -1,4 +1,4 @@
-import { Card } from './ui/card';
+import { Card } from '../ui/card';
 
 const MatchScore = ({ score }: { score: number }) => {
   const getColor = (s: number) => {
@@ -39,7 +39,7 @@ const MatchScore = ({ score }: { score: number }) => {
           <span className="text-3xl font-bold dark:text-white">{score}%</span>
         </div>
       </div>
-      <p className="mt-4 text-sm font-semibold text-slate-500 uppercase tracking-wider">
+      <p className="mt-4 dark:text-slate-300 text-sm font-semibold text-slate-500 uppercase tracking-wider">
         Match Score
       </p>
     </Card>
