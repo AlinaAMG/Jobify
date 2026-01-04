@@ -10,9 +10,9 @@ import Logo from './Logo';
 const Sidebar = () => {
   const pathname = usePathname();
   return (
-    <aside className="h-full px-8 py-4 bg-muted">
+    <aside className="h-full px-8 py-4 bg-muted ">
       <Logo />
-      <div className="flex flex-col mt-20 gap-y-4">
+      <div className="flex flex-col mt-20 gap-y-4 sticky top-10">
         {links &&
           links.map((link) => {
             return (
