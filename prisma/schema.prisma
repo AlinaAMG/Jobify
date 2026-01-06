@@ -24,4 +24,21 @@ model Job {
   location  String
   status      String
   mode     String
+  aiCoach     AiCoach?
+}
+
+model AiCoach {
+  id              String   @id @default(uuid())
+  jobId           String   @unique 
+  job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  matchingScore   Int
+  mission         String   @db.Text
+  strategy        String   @db.Text
+  missingSkills   String   @db.Text
+  matchingSkills  String   @db.Text
+  coverLetter     String?  @db.Text // Optioneel: als je ook de brief wilt opslaan
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
