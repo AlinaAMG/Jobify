@@ -24,19 +24,15 @@ model Job {
   location  String
   status      String
   mode     String
-
-  // Relatie: Een job KAN een AI-coach analyse hebben
-  aiCoach     AiCoach?
+ aiCoach     AiCoach?
 }
 
 model AiCoach {
   id              String   @id @default(uuid())
-
-  // Koppeling naar de Job tabel
   jobId           String   @unique 
   job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
   
-  // AI Specifieke velden
+
   matchingScore   Int
   mission         String   @db.Text
   strategy        String   @db.Text

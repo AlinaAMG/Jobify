@@ -10,6 +10,17 @@ export type JobType = {
   location: string;
   status: string;
   mode: string;
+  aiCoach?: AiCoachType | null;
+};
+
+export type AiCoachType = {
+  id: string;
+  matchingScore: number;
+  mission: string;
+  strategy: string;
+  missingSkills: string;
+  matchingSkills: string;
+  coverLetter?: string | null;
 };
 
 export enum JobStatus {
