@@ -24,20 +24,25 @@ model Job {
   location  String
   status      String
   mode     String
+
+  // Relatie: Een job KAN een AI-coach analyse hebben
   aiCoach     AiCoach?
 }
 
 model AiCoach {
   id              String   @id @default(uuid())
+
+  // Koppeling naar de Job tabel
   jobId           String   @unique 
   job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
   
+  // AI Specifieke velden
   matchingScore   Int
   mission         String   @db.Text
   strategy        String   @db.Text
   missingSkills   String   @db.Text
   matchingSkills  String   @db.Text
-  coverLetter     String?  @db.Text // Optioneel: als je ook de brief wilt opslaan
+  coverLetter     String?  @db.Text 
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
