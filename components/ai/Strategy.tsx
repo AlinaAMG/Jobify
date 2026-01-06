@@ -9,28 +9,32 @@ type StrategyProps = {
 const Strategy = ({ summary,interviewTip}:StrategyProps) => {
   return (
     <div className="grid md:grid-cols-2 gap-3">
-      <Card className="border-slate-200">
+      <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-bold flex items-center gap-2 text-slate-500 uppercase tracking-wider">
+          <CardTitle className="text-sm font-bold flex items-center gap-2 dark:text-slate-400 uppercase tracking-wider">
             <Lightbulb className="w-4 h-4" />
             De Kernmissie
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="leading-relaxed font-medium">{summary}</p>
+          <p className="leading-relaxed font-medium dark:text-slate-300">
+            {summary}
+          </p>
         </CardContent>
       </Card>
 
       {/* 4. Coach's Strategy Section */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-bold flex items-center gap-2  uppercase tracking-wider text-slate-500">
+          <CardTitle className="text-sm font-bold flex items-center gap-2  uppercase tracking-wider dark:text-slate-400">
             <MessageSquareQuote className="w-4 h-4" />
             Coach Strategie
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="font-medium leading-relaxed">{interviewTip}</p>
+          <p className="font-medium leading-relaxed dark:text-slate-300">
+            {interviewTip}
+          </p>
         </CardContent>
       </Card>
     </div>

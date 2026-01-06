@@ -15,7 +15,7 @@ const AiCoachForm = ({ onSubmit, form, isPending }: AiCoachFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4 "
+        className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4"
       >
         {/* Vacatureveld */}
         <CustomFormTextarea

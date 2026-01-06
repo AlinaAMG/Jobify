@@ -92,9 +92,9 @@ const CoverLetter = ({ description, skills }: CoverLetterProps) => {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="p-8 bg-white">
+          <CardContent className="p-8 ">
             <div className="max-w-2xl mx-auto border-l-4 border-indigo-100 pl-8 py-2">
-              <p className="whitespace-pre-wrap text-slate-800 leading-relaxed font-serif text-lg">
+              <p className="whitespace-pre-wrap dark:text-slate-300 leading-relaxed  text-md">
                 {aiResult.coverLetter}
               </p>
             </div>
