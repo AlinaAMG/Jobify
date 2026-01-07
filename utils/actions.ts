@@ -341,6 +341,9 @@ export const getSingleJobAction = async (
         id,
         clerkId: userId,
       },
+      include: {
+        aiCoach: true,
+      },
     });
   } catch (error) {
     job = null;
