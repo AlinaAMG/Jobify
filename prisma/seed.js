@@ -5,17 +5,29 @@ const prisma = new PrismaClient();
 
 const main = async () => {
   const clerkId = process.env.NEXT_PUBLIC_CLERK_USER_ID;
-  const jobs = data.map((job) => {
-    return {
-      ...job,
-      clerkId,
-    };
-  });
-  for (const job of jobs) {
+  if (!clerkId) {
+    console.error(
+      'Fout: NEXT_PUBLIC_CLERK_USER_ID niet gevonden in .env.local'
+    );
+    return;
+  }
+
+  for (const job of data) {
     await prisma.job.create({
-      data: job,
+      data: {
+        position: job.position,
+        company: job.company,
+        location: job.location,
+        status: job.status,
+        mode: job.mode,
+        description: job.description,
+        clerkId: clerkId,
+
+        createdAt: new Date(job.createdAt),
+      },
     });
   }
+  console.log('Seed succesvol: Jobs zijn toegevoegd!');
 };
 main()
   .then(async () => {

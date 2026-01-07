@@ -22,6 +22,7 @@ model Job {
   position    String
   company   String
   location  String
+  description String @db.Text
   status      String
   mode     String
  aiCoach     AiCoach?

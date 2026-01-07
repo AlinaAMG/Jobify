@@ -1,11 +1,13 @@
 import * as z from 'zod';
 
+
 export type JobType = {
   id: string;
   createdAt: Date;
   updatedAt: Date;
   clerkId: string;
   position: string;
+  description: string;
   company: string;
   location: string;
   status: string;
@@ -17,6 +19,7 @@ export type AiCoachType = {
   id: string;
   matchingScore: number;
   mission: string;
+  company?: string;
   strategy: string;
   missingSkills: string;
   matchingSkills: string;
@@ -47,6 +50,7 @@ export const createAndEditJobSchema = z.object({
   }),
   status: z.nativeEnum(JobStatus),
   mode: z.nativeEnum(JobMode),
+  description: z.string(),
 });
 
 export type CreateAndEditJobType = z.infer<typeof createAndEditJobSchema>;
