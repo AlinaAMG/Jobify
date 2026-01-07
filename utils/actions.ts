@@ -7,11 +7,13 @@ import {
   CreateAndEditJobType,
   createAndEditJobSchema,
   GetAllJobsActionTypes,
+  AiCoachType,
 } from './types';
 import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
 import { callAI } from './ai-service';
+import { revalidatePath } from 'next/cache';
 
 // export const analyzeWithGemini = async (jobDescription: string) => {
 //   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -193,6 +195,33 @@ export async function ChatAssistantWithGeminiAction(
     };
   }
 }
+
+export const createAiAnalysisAction = async (
+  jobId: string,
+  data: AiCoachType
+) => {
+  const user = authenticateAndRedirect();
+  try {
+    const aiAnalysis = await prisma.aiCoach.upsert({
+      where: {
+        jobId: jobId,
+      },
+      update: {
+        ...data,
+      },
+      create: {
+        jobId: jobId,
+        ...data,
+      },
+    });
+    revalidatePath(`/ai-coach/${jobId}`);
+    revalidatePath('/jobs');
+    return aiAnalysis;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
 
 
 function authenticateAndRedirect(): string {
