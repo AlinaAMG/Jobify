@@ -7,14 +7,13 @@ import {
   CreateAndEditJobType,
   createAndEditJobSchema,
   GetAllJobsActionTypes,
-  AiCoachType,
+  Profile,
 } from './types';
 import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
 import { callAI } from './ai-service';
 import { revalidatePath } from 'next/cache';
-
 
 export const analyzeJobAndCvWithGemini = async (
   description: string,
@@ -126,34 +125,110 @@ export async function ChatAssistantWithGeminiAction(
     };
   }
 }
-
-export const createAiAnalysisAction = async (
+export const startAiAnalysisAction = async (
   jobId: string,
-  data: AiCoachType
+  resumeText: string
 ) => {
-  const user = authenticateAndRedirect();
+  const userId = authenticateAndRedirect();
+
   try {
-    const aiAnalysis = await prisma.aiCoach.upsert({
-      where: {
-        jobId: jobId,
-      },
+    const job = await prisma.job.findFirst({
+      where: { id: jobId, clerkId: userId },
+    });
+    if (!job) throw new Error('Job niet gevonden');
+
+    // Alleen de analyse (match score, skills, etc.)
+    const analysis = await analyzeJobAndCvWithGemini(
+      job.description,
+      resumeText
+    );
+    const data = typeof analysis === 'string' ? JSON.parse(analysis) : analysis;
+
+    const aiRecord = await prisma.aiCoach.upsert({
+      where: { jobId },
       update: {
-        ...data,
+        matchingScore: data.matchScore,
+        strategy: data.summary,
+        mission: data.interviewTip,
+        matchingSkills: Array.isArray(data.matchingSkills)
+          ? data.matchingSkills.join(', ')
+          : data.matchingSkills,
+        missingSkills: Array.isArray(data.missingSkills)
+          ? data.missingSkills.join(', ')
+          : data.missingSkills,
       },
       create: {
-        jobId: jobId,
-        ...data,
+        jobId,
+        matchingScore: data.matchScore,
+        strategy: data.summary,
+        mission: data.interviewTip,
+        matchingSkills: Array.isArray(data.matchingSkills)
+          ? data.matchingSkills.join(', ')
+          : data.matchingSkills,
+        missingSkills: Array.isArray(data.missingSkills)
+          ? data.missingSkills.join(', ')
+          : data.missingSkills,
       },
     });
-    revalidatePath(`/ai-coach/${jobId}`);
-    revalidatePath('/jobs');
-    return aiAnalysis;
+
+    return aiRecord;
   } catch (error) {
     console.error(error);
     return null;
   }
 };
+export const startGenerateLetterAction = async (jobId: string) => {
+  const { userId } = auth(); // Of je authenticateAndRedirect()
+  if (!userId) throw new Error('Niet geautoriseerd');
 
+  try {
+    // 1. Haal de job en de bestaande analyse op
+    const job = await prisma.job.findUnique({
+      where: { id: jobId, clerkId: userId },
+      include: { aiCoach: true },
+    });
+
+    if (!job || !job.aiCoach) {
+      throw new Error('Voer eerst de AI-analyse uit.');
+    }
+
+    // 2. Roep je Gemini brief-functie aan
+    // We splitsen de skills-string weer even op naar een array
+    const skillsArray = job.aiCoach.matchingSkills.split(', ');
+
+    const letterResponse = await generateCoverLetterWithGemini(
+      job.description,
+      skillsArray
+    );
+
+    // 3. JSON check (om [object Object] errors te voorkomen)
+    const cleanJson =
+      typeof letterResponse === 'string'
+        ? JSON.parse(
+            letterResponse
+              .replace(/```json/g, '')
+              .replace(/```/g, '')
+              .trim()
+          )
+        : letterResponse;
+
+    // 4. Update de AiCoach record in de database
+    const updatedRecord = await prisma.aiCoach.update({
+      where: { jobId: jobId },
+      data: {
+        coverLetter: cleanJson.coverLetter,
+      },
+    });
+
+    // 5. Ververs de pagina zodat de brief direct verschijnt
+    revalidatePath(`/ai-coach/${jobId}`);
+
+    return updatedRecord;
+  } catch (error) {
+    console.error('Fout bij genereren brief:', error);
+    throw error;
+  }
+};
 
 function authenticateAndRedirect(): string {
   const { userId } = auth();
@@ -161,6 +236,38 @@ function authenticateAndRedirect(): string {
   if (!userId) redirect('/');
   return userId;
 }
+
+export const getProfileAction = async () => {
+  const { userId } = auth();
+
+  if (!userId) return null;
+
+  try {
+    const profile = await prisma.profile.findUnique({
+      where: {
+        clerkId: userId,
+      },
+    });
+    return profile;
+  } catch (error) {
+    console.error('Fout bij ophalen profiel:', error);
+    return null;
+  }
+};
+
+export const updateProfileAction = async (resumeText: string) => {
+  const { userId } = auth();
+  if (!userId) throw new Error('Niet ingelogd');
+
+  const profile = await prisma.profile.upsert({
+    where: { clerkId: userId },
+    update: { resume: resumeText },
+    create: { clerkId: userId, resume: resumeText },
+  });
+
+  revalidatePath('/ai-coach');
+  return profile;
+};
 
 export async function createJobAction(
   values: CreateAndEditJobType

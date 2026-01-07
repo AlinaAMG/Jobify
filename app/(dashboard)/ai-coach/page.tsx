@@ -1,22 +1,32 @@
 'use client';
 
-import AiCoachForm from '@/components/ai/AiCoachForm';
-import AiCoachResult from '@/components/ai/AiCoachResult';
-import AiCoachSkeleton from '@/components/ai/AiCoachSkeleton';
-import { analyzeJobAndCvWithGemini } from '@/utils/actions';
+import AiCoachForm from '@/components/ai-coach/AiCoachForm';
+import AiCoachResult from '@/components/ai-coach/AiCoachResult';
+import AiCoachSkeleton from '@/components/ai-coach/AiCoachSkeleton';
+import {
+  getProfileAction,
+  getSingleJobAction,
+  startAiAnalysisAction,
+  updateProfileAction,
+} from '@/utils/actions';
 import {
   AiAnalysisResult,
   AiCoachFormSchema,
   AiCoachFormValues,
 } from '@/utils/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState, useTransition } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 const AiCoachPage = () => {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<AiAnalysisResult | null>(null);
+  const searchParams = useSearchParams();
+  const jobId = searchParams.get('id');
+  const router = useRouter();
 
   const form = useForm<AiCoachFormValues>({
     resolver: zodResolver(AiCoachFormSchema),
@@ -25,38 +35,60 @@ const AiCoachPage = () => {
       resume: '',
     },
   });
+
+  useEffect(() => {
+    const loadData = async () => {
+      // Haal beide tegelijk op voor snelheid
+      const [job, profile] = await Promise.all([
+        jobId ? getSingleJobAction(jobId) : Promise.resolve(null),
+        getProfileAction(),
+      ]);
+
+      if (job || profile) {
+        form.reset({
+          description: job?.description || '',
+          resume: profile?.resume || '',
+        });
+      }
+    };
+
+    loadData();
+  }, [jobId]);
+
   const handleSubmit = (values: AiCoachFormValues) => {
-    setResult(null);
     startTransition(async () => {
       try {
-        const data = await analyzeJobAndCvWithGemini(
-          values.description,
-          values.resume
-        );
-        setResult(data);
-        toast.success('Analyse voltooid!');
-        form.setValue('description', '');
+        // STAP 1: Stuur je persoonlijke CV tekst naar de backend
+        await updateProfileAction(values.resume);
+
+        // STAP 2: Voer de AI analyse uit met diezelfde persoonlijke tekst
+        if (jobId) {
+          const data = await startAiAnalysisAction(jobId, values.resume);
+          if (data) {
+            toast.success('Je persoonlijke CV is opgeslagen en geanalyseerd!');
+            router.push(`/ai-coach/${jobId}`);
+          }
+        }
       } catch (error) {
-        toast.error('Analyse mislukt. Probeer het later opnieuw.');
+        toast.error('Er ging iets mis bij het opslaan van je CV.');
       }
     });
   };
 
   return (
-    <div className=" mx-auto p-4 sm:p-8 space-y-10 bg-muted rounded">
-      {/* Header sectie */}
+    <div className="mx-auto p-4 sm:p-8 space-y-10 bg-muted rounded">
       <section>
-        <h1 className="text-4xl font-extrabold tracking-tight  mb-2">
-          AI Carrière Coach
+        <h1 className="text-4xl font-extrabold tracking-tight mb-2">
+          AI Carrière Coach {jobId ? 'voor Vacature' : ''}
         </h1>
-        <p className="text-lg">
-          Plak een vacaturetekst en laat de AI de belangrijkste vaardigheden en
-          gespreksstrategieën voor je vinden.
+        <p className="text-lg text-muted-foreground">
+          {jobId
+            ? 'De vacaturetekst is ingeladen. Controleer je CV en start de analyse.'
+            : 'Plak een vacaturetekst en laat de AI je helpen.'}
         </p>
       </section>
 
-      {/* Formulier sectie */}
-      <section className=" rounded-xl shadow-sm border border-slate-100 p-1">
+      <section className="bg-background rounded-xl shadow-sm border p-4">
         <AiCoachForm
           form={form}
           onSubmit={handleSubmit}
@@ -64,14 +96,12 @@ const AiCoachPage = () => {
         />
       </section>
 
-      {/* Resultaat of Loading sectie */}
       <section className="min-h-[400px]">
         {isPending && <AiCoachSkeleton />}
         {!isPending && result && <AiCoachResult data={result} />}
-
         {!isPending && !result && (
-          <div className="h-full min-h-[250px] flex items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center ">
-            <p>Jouw analyse resultaten verschijnen hier...</p>
+          <div className="h-full min-h-[250px] flex items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center text-muted-foreground">
+            <p>Klik op de knop om de analyse te starten...</p>
           </div>
         )}
       </section>

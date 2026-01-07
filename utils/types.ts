@@ -26,6 +26,11 @@ export type AiCoachType = {
   coverLetter?: string | null;
 };
 
+export type Profile = {
+  id: string;
+  clerkId: string;
+  resume: string;
+};
 export enum JobStatus {
   Pending = 'pending',
   Interview = 'interview',

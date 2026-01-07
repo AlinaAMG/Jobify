@@ -1,5 +1,5 @@
 import { AiAnalysisResult } from '@/utils/types';
-import CoverLetter from '@/components/ai/CoverLetter';
+import CoverLetter from '@/components/ai-coach/CoverLetter';
 import MatchScore from './MatchScore';
 import SkillsJob from './SkillsJob';
 import MatchingSkills from './MatchingSkills';
