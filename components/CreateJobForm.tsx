@@ -69,16 +69,16 @@ const CreateJobForm = () => {
         </h2>
         <div className="grid items-start gap-4 md:grid-cols-2 lg:grid-cols-3">
           {/* POSITION */}
-          <CustomFormField name="position" control={form.control} />
+          <CustomFormField name="Functietitle" control={form.control} />
           {/* COMPANY */}
-          <CustomFormField name="company" control={form.control} />
+          <CustomFormField name="Bedrijfsnaam" control={form.control} />
           {/* LOCATION */}
-          <CustomFormField name="location" control={form.control} />
+          <CustomFormField name="Locatie" control={form.control} />
           {/* JOB STATUS  */}
           <CustomFormSelect
             name="status"
             control={form.control}
-            labelText="job status"
+            labelText="Status"
             items={Object.values(JobStatus)}
           />
           {/* JOB MODE */}
@@ -86,14 +86,14 @@ const CreateJobForm = () => {
           <CustomFormSelect
             name="mode"
             control={form.control}
-            labelText="job mode"
+            labelText="Dienstverband"
             items={Object.values(JobMode)}
           />
           <div className="grid  md:col-span-2 lg:col-span-3">
             <CustomFormTextarea
               name="description"
               control={form.control}
-              labelText="description"
+              labelText="Omschrijving"
             />
           </div>
           <Button

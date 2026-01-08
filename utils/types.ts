@@ -45,17 +45,19 @@ export enum JobMode {
 
 export const createAndEditJobSchema = z.object({
   position: z.string().min(2, {
-    message: 'position must be at least 2 characters.',
+    message: 'Functietitel moet minimaal 2 tekens bevatten.',
   }),
   company: z.string().min(2, {
-    message: 'company must be at least 2 characters.',
+    message: 'Bedrijfsnaam moet minimaal 2 tekens bevatten.',
   }),
   location: z.string().min(2, {
-    message: 'location must be at least 2 characters.',
+    message: 'Locatie moet minimaal 2 tekens bevatten',
   }),
   status: z.nativeEnum(JobStatus),
   mode: z.nativeEnum(JobMode),
-  description: z.string(),
+  description: z
+    .string()
+    .min(20, { message: 'Omschrijving moet minimaal 20 tekens bevatten.' }),
 });
 
 export type CreateAndEditJobType = z.infer<typeof createAndEditJobSchema>;
