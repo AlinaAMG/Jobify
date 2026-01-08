@@ -57,7 +57,6 @@ const CreateJobForm = () => {
   });
 
   const onSubmit = (values: CreateAndEditJobType) => {
-    console.log('Formulier succesvol gevalideerd:', values);
     mutate(values);
   };
 
@@ -106,10 +105,6 @@ const CreateJobForm = () => {
           >
             {isPending ? 'opslaan' : 'vacature toevoegen'}
           </Button>
-        </div>
-        <div className="text-red-500 font-bold">
-          {form.formState.errors.description?.message}
-          {form.formState.errors.position?.message}
         </div>
       </form>
     </Form>

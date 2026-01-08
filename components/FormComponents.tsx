@@ -110,7 +110,7 @@ export const CustomFormTextarea = ({
               {...field}
               value={field.value ?? ''}
               placeholder={placeholder}
-              className={`${heightClass} resize-none mb-7`}
+              className={`${heightClass} resize-y mb-7`}
             />
           </FormControl>
           <FormMessage />

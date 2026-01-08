@@ -13,7 +13,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 
-import { CustomFormField, CustomFormSelect } from './FormComponents';
+import {
+  CustomFormField,
+  CustomFormSelect,
+  CustomFormTextarea,
+} from './FormComponents';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { getSingleJobAction, updateJobAction } from '@/utils/actions';
 toast;
@@ -54,6 +58,7 @@ function EditJobForm({ jobId }: { jobId: string }) {
       location: data?.location || '',
       status: (data?.status as JobStatus) || JobStatus.Pending,
       mode: (data?.mode as JobMode) || JobMode.FullTime,
+      description: data?.description || '',
     },
   });
 
@@ -95,6 +100,13 @@ function EditJobForm({ jobId }: { jobId: string }) {
             labelText="job mode"
             items={Object.values(JobMode)}
           />
+          <div className="grid  md:col-span-2 lg:col-span-3">
+            <CustomFormTextarea
+              name="description"
+              control={form.control}
+              labelText="Omschrijving"
+            />
+          </div>
 
           <Button
             type="submit"
