@@ -23,6 +23,7 @@ const AiCoachForm = ({ onSubmit, form, isPending }: AiCoachFormProps) => {
           control={form.control}
           labelText="Vacaturetext"
           placeholder="Plak hier een vacaturetext die je wilt..."
+          heightClass="min-h-[400px]"
         />
         {/* CV Veld */}
         <CustomFormTextarea
@@ -30,6 +31,7 @@ const AiCoachForm = ({ onSubmit, form, isPending }: AiCoachFormProps) => {
           control={form.control}
           labelText="Jouw CV"
           placeholder="Plak hier je eigen werkervaring of CV text..."
+          heightClass="min-h-[400px]"
         />
         <Button
           type="submit"

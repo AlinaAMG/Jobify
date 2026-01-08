@@ -88,6 +88,7 @@ type CustomFormTextareaProps = {
   control: Control<any>;
   labelText?: string;
   placeholder?: string;
+  heightClass?: string;
 };
 
 export const CustomFormTextarea = ({
@@ -95,6 +96,7 @@ export const CustomFormTextarea = ({
   control,
   labelText,
   placeholder,
+  heightClass = 'min-h-[150px]',
 }: CustomFormTextareaProps) => {
   return (
     <FormField
@@ -107,7 +109,7 @@ export const CustomFormTextarea = ({
             <Textarea
               {...field}
               placeholder={placeholder}
-              className="min-h-[500px] resize-none  mb-7"
+              className={`${heightClass} resize-none mb-7`}
             />
           </FormControl>
           <FormMessage />

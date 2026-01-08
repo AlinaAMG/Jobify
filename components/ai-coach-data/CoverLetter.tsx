@@ -19,14 +19,14 @@ const CoverLetter = ({ analysis }: CoverLetterProps) => {
       <CardHeader>
         <div className="flex items-center gap-2">
           <FileText className="text-blue-500 w-5 h-5" />
-          <CardTitle>Gegenereerde Sollicitatiebrief</CardTitle>
+          <CardTitle>Persoonlijke Motivatiebrief</CardTitle>
         </div>
       </CardHeader>
       <Separator />
       <CardContent className="pt-6">
         {analysis.coverLetter ? (
           // Als de brief bestaat: Toon de brief
-          <div className="p-6 bg-slate-50 rounded-lg border border-slate-200 text-slate-800 leading-relaxed whitespace-pre-wrap">
+          <div className="p-6  dark:text-slate-200 rounded-lg border border-slate-200 text-slate-800 leading-relaxed whitespace-pre-wrap">
             {analysis.coverLetter}
           </div>
         ) : (

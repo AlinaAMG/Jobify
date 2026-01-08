@@ -13,7 +13,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 
-import { CustomFormField, CustomFormSelect } from './FormComponents';
+import {
+  CustomFormField,
+  CustomFormSelect,
+  CustomFormTextarea,
+} from './FormComponents';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createJobAction } from '@/utils/actions';
 import { toast } from 'sonner';
@@ -85,6 +89,13 @@ const CreateJobForm = () => {
             labelText="job mode"
             items={Object.values(JobMode)}
           />
+          <div className="grid  md:col-span-2 lg:col-span-3">
+            <CustomFormTextarea
+              name="description"
+              control={form.control}
+              labelText="description"
+            />
+          </div>
           <Button
             type="submit"
             className="self-end capitalize "
