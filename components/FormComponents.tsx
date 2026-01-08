@@ -30,7 +30,7 @@ export const CustomFormField = ({ name, control }: CustomFormFieldProps) => {
         <FormItem>
           <FormLabel className="capitalize">{name}</FormLabel>
           <FormControl>
-            <Input {...field} />
+            <Input {...field} value={field.value ?? ''} />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -108,6 +108,7 @@ export const CustomFormTextarea = ({
           <FormControl>
             <Textarea
               {...field}
+              value={field.value ?? ''}
               placeholder={placeholder}
               className={`${heightClass} resize-none mb-7`}
             />

@@ -81,8 +81,8 @@ export type AiAnalysisResult = {
 };
 
 export const AiCoachFormSchema = z.object({
-  description: z.string().min(50, {
-    message: 'De vacatureomschrijving is te kort. Voeg minimaal 50 tekens toe.',
+  description: z.string().min(20, {
+    message: 'De vacatureomschrijving is te kort. Voeg minimaal 20 tekens toe.',
   }),
   resume: z.string().min(20, {
     message: 'De cv text is te kort.Voeg minimaal 20 tekens toe.',

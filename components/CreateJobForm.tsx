@@ -26,12 +26,14 @@ import { useRouter } from 'next/navigation';
 const CreateJobForm = () => {
   const form = useForm<CreateAndEditJobType>({
     resolver: zodResolver(createAndEditJobSchema),
+    mode: 'onChange',
     defaultValues: {
       position: '',
       company: '',
       location: '',
       status: JobStatus.Pending,
       mode: JobMode.FullTime,
+      description: '',
     },
   });
 
@@ -55,6 +57,7 @@ const CreateJobForm = () => {
   });
 
   const onSubmit = (values: CreateAndEditJobType) => {
+    console.log('Formulier succesvol gevalideerd:', values);
     mutate(values);
   };
 
@@ -69,11 +72,11 @@ const CreateJobForm = () => {
         </h2>
         <div className="grid items-start gap-4 md:grid-cols-2 lg:grid-cols-3">
           {/* POSITION */}
-          <CustomFormField name="Functietitle" control={form.control} />
+          <CustomFormField name="position" control={form.control} />
           {/* COMPANY */}
-          <CustomFormField name="Bedrijfsnaam" control={form.control} />
+          <CustomFormField name="company" control={form.control} />
           {/* LOCATION */}
-          <CustomFormField name="Locatie" control={form.control} />
+          <CustomFormField name="location" control={form.control} />
           {/* JOB STATUS  */}
           <CustomFormSelect
             name="status"
@@ -103,6 +106,10 @@ const CreateJobForm = () => {
           >
             {isPending ? 'opslaan' : 'vacature toevoegen'}
           </Button>
+        </div>
+        <div className="text-red-500 font-bold">
+          {form.formState.errors.description?.message}
+          {form.formState.errors.position?.message}
         </div>
       </form>
     </Form>
