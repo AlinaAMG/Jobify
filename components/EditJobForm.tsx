@@ -38,14 +38,20 @@ function EditJobForm({ jobId }: { jobId: string }) {
       updateJobAction(jobId, values),
     onSuccess: (data) => {
       if (!data) {
-        toast('Er is iets misgegaan');
+        toast.error('Er is iets misgegaan');
         return;
       }
-      toast('vacature bijgewerkt');
+      toast.success(
+        'Wijzigingen opgeslagen! Start nu een nieuwe AI-analyse voor deze aangepaste tekst.',
+        {
+          duration: 5000,
+          icon: '✨',
+        }
+      );
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
       queryClient.invalidateQueries({ queryKey: ['job', jobId] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
-      router.push('/jobs');
+      router.push(`/ai-coach/${jobId}`);
     },
   });
 
@@ -64,11 +70,9 @@ function EditJobForm({ jobId }: { jobId: string }) {
 
   // 2. Define a submit handler.
   function onSubmit(values: CreateAndEditJobType) {
-    // Do something with the form values.
-    //  This will be type-safe and validated.
     mutate(values);
   }
-
+  
   return (
     <Form {...form}>
       <form

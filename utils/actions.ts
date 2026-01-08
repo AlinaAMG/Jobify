@@ -14,6 +14,7 @@ import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
 import { callAI } from './ai-service';
 import { revalidatePath } from 'next/cache';
+import { type AiAnalysisResult } from './types';
 
 export const analyzeJobAndCvWithGemini = async (
   description: string,
@@ -398,6 +399,7 @@ export const updateJobAction = async (
 ): Promise<JobType | null> => {
   const userId = authenticateAndRedirect();
   try {
+    // 1. Update de Job data (titel, omschrijving, etc.)
     const job: JobType = await prisma.job.update({
       where: {
         id,
@@ -407,6 +409,14 @@ export const updateJobAction = async (
         ...values,
       },
     });
+    // 2. Verwijder de AiCoach record die bij deze Job hoort
+
+    await prisma.aiCoach.deleteMany({
+      where: {
+        jobId: id,
+      },
+    });
+
     return job;
   } catch (error) {
     return null;
