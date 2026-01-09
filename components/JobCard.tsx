@@ -1,5 +1,6 @@
+'use client';
 import { type JobType } from '@/utils/types';
-import { Briefcase, CalendarDays, MapPin, RadioTower } from 'lucide-react';
+import { Briefcase, CalendarDays, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
@@ -15,16 +16,19 @@ import { Button } from './ui/button';
 import JobInfo from './JobInfo';
 import DeleteJobBtn from './DeleteJobBtn';
 import { Sparkles } from 'lucide-react';
+import { getStatusColor } from '@/utils/interview-utils';
+import { cn } from '@/lib/utils';
+import InterviewSection from './InterviewSection';
 
 const JobCard = ({ job }: { job: JobType }) => {
   const date = new Date(job.createdAt).toLocaleDateString();
 
   return (
-    <Card className="bg-muted">
+    <Card className="bg-muted flex flex-col h-full min-h-[350px]">
       <CardHeader>
         <CardTitle className="flex justify-between items-start">
           {job.position}
-          {/* Als er al een aiCoach analyse is, toon een klein icoontje */}
+
           {job.aiCoach && (
             <Badge variant="outline" className="text-primary border-primary">
               <Sparkles className="w-3 h-3 mr-1" /> AI Ready
@@ -36,24 +40,42 @@ const JobCard = ({ job }: { job: JobType }) => {
 
       <Separator />
 
-      <CardContent className="mt-4 grid grid-cols-2 gap-4">
-        <JobInfo icon={<Briefcase />} text={job.mode} />
-        <JobInfo icon={<MapPin />} text={job.location} />
-        <JobInfo icon={<CalendarDays />} text={date} />
-        <Badge className="w-32 justify-center">
-          <JobInfo
-            icon={<RadioTower className="w-4 h-4" />}
-            text={job.status}
-          />
-        </Badge>
+      <CardContent className="mt-4 grid  gap-4 flex-grow">
+        <div className="grid grid-cols-2 gap-3 items-start">
+          <JobInfo icon={<Briefcase />} text={job.mode} />
+          <JobInfo icon={<MapPin />} text={job.location} />
+          <JobInfo icon={<CalendarDays />} text={date} />
+          {/* De Badge container */}
+          <div className="flex justify-start">
+            <Badge
+              variant="outline"
+              className={cn(
+                'w-fit px-3 py-1 flex items-center gap-2 font-semibold capitalize transition-all shadow-sm',
+                getStatusColor(job.status)
+              )}
+            >
+              <div
+                className={cn(
+                  'w-2 h-2 rounded-full animate-pulse',
+                  job.status?.toLowerCase() === 'declined' && 'bg-red-700',
+                  job.status?.toLowerCase() === 'pending' && 'bg-yellow-500',
+                  job.status?.toLowerCase() === 'interview' && 'bg-emerald-500'
+                )}
+              />
+              {job.status}
+            </Badge>
+          </div>
+        </div>
       </CardContent>
 
-      <CardFooter className="flex flex-wrap gap-2">
+      {/* INTERVIEW SECTIE  */}
+      <InterviewSection job={job} />
+      <CardFooter className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-slate-200/50">
         <Button asChild size="sm" variant="outline">
           <Link href={`/jobs/${job.id}`}>Bijwerken</Link>
         </Button>
 
-        {/* NIEUWE KNOP: AI COACH */}
+        {/* AI COACH KNOP */}
         <Button
           asChild
           size="sm"
