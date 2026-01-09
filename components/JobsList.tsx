@@ -11,12 +11,14 @@ import PaginationSkeleton from './PaginationSkeleton';
 import { Skeleton } from './ui/skeleton';
 import { SearchX } from 'lucide-react';
 import { Button } from './ui/button';
+import { useMemo } from 'react';
 
 const JobsList = () => {
   const router = useRouter();
   const pathname = usePathname();
 
   const searchParams = useSearchParams();
+
   const search = searchParams.get('search') || '';
   const jobStatus = searchParams.get('jobStatus') || 'all';
 
@@ -32,6 +34,33 @@ const JobsList = () => {
   const count = data?.count || [];
   const page = data?.page || 0;
   const totalPages = data?.totalPages || 0;
+
+  // Sorteren de vacatures bij interviewDate, interviewTime
+  const sortedJobs = useMemo(() => {
+    if (!jobs) return [];
+
+    const nu = new Date().getTime();
+
+    return [...jobs].sort((a, b) => {
+      // 1. Geen datum? Onderaan.
+      if (!a.interviewDate) return 1;
+      if (!b.interviewDate) return -1;
+
+      const tijdA = new Date(a.interviewDate).getTime();
+      const tijdB = new Date(b.interviewDate).getTime();
+
+      // 2. Check of ze in het verleden liggen
+      const isVerstrekenA = tijdA < nu;
+      const isVerstrekenB = tijdB < nu;
+
+      // 3. Verstreken items naar beneden drukken
+      if (isVerstrekenA && !isVerstrekenB) return 1;
+      if (!isVerstrekenA && isVerstrekenB) return -1;
+
+      // 4. Binnen de groepen sorteren (dichtstbijzijnde eerst)
+      return tijdA - tijdB;
+    });
+  }, [jobs]); // Alleen opnieuw berekenen als 'jobs' verandert
 
   if (isPending)
     return (
@@ -112,7 +141,7 @@ const JobsList = () => {
       </div>
       {/* BUTTON CONTAINER */}
       <div className="grid md:grid-cols-2 gap-8">
-        {jobs.map((job) => {
+        {sortedJobs.map((job) => {
           return <JobCard key={job.id} job={job} />;
         })}
       </div>
