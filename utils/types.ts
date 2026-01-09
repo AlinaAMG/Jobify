@@ -11,6 +11,8 @@ export type JobType = {
   company: string;
   location: string;
   status: string;
+  interviewDate: Date;
+  interviewTime: string;
   mode: string;
   aiCoach?: AiCoachType | null;
 };
@@ -54,6 +56,8 @@ export const createAndEditJobSchema = z.object({
     message: 'Locatie moet minimaal 2 tekens bevatten',
   }),
   status: z.nativeEnum(JobStatus),
+  interviewDate: z.date().optional().nullable(),
+  interviewTime: z.string().optional().nullable(),
   mode: z.nativeEnum(JobMode),
   description: z
     .string()

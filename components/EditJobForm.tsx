@@ -23,6 +23,7 @@ import { getSingleJobAction, updateJobAction } from '@/utils/actions';
 toast;
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { Calendar24 } from './Calendar';
 
 function EditJobForm({ jobId }: { jobId: string }) {
   const queryClient = useQueryClient();
@@ -63,6 +64,10 @@ function EditJobForm({ jobId }: { jobId: string }) {
       company: data?.company || '',
       location: data?.location || '',
       status: (data?.status as JobStatus) || JobStatus.Pending,
+      interviewDate: data?.interviewDate
+        ? new Date(data.interviewDate)
+        : undefined,
+      interviewTime: data?.interviewTime || '',
       mode: (data?.mode as JobMode) || JobMode.FullTime,
       description: data?.description || '',
     },
@@ -72,7 +77,9 @@ function EditJobForm({ jobId }: { jobId: string }) {
   function onSubmit(values: CreateAndEditJobType) {
     mutate(values);
   }
-  
+
+  const currentStatus = form.watch('status');
+
   return (
     <Form {...form}>
       <form
@@ -97,6 +104,7 @@ function EditJobForm({ jobId }: { jobId: string }) {
             labelText="job status"
             items={Object.values(JobStatus)}
           />
+
           {/* job  type */}
           <CustomFormSelect
             name="mode"
@@ -104,7 +112,17 @@ function EditJobForm({ jobId }: { jobId: string }) {
             labelText="job mode"
             items={Object.values(JobMode)}
           />
-          <div className="grid  md:col-span-2 lg:col-span-3">
+          {currentStatus === 'interview' && (
+            <div className="p-4 border rounded-lg bg-slate-50/50 my-4 animate-in fade-in zoom-in-95 grid col-span-2">
+              <Calendar24
+                dateValue={form.getValues('interviewDate')}
+                onDateChange={(date) => form.setValue('interviewDate', date)}
+                timeValue={form.watch('interviewTime')}
+                onTimeChange={(time) => form.setValue('interviewTime', time)}
+              />
+            </div>
+          )}
+          <div className=" grid col-span-2 lg:col-span-3">
             <CustomFormTextarea
               name="description"
               control={form.control}

@@ -24,6 +24,8 @@ model Job {
   location  String
   description String @db.Text
   status      String
+  interviewDate DateTime?
+  interviewTime String?
   mode     String
  aiCoach     AiCoach?
 }
