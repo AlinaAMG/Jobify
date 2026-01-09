@@ -11,8 +11,8 @@ export type JobType = {
   company: string;
   location: string;
   status: string;
-  interviewDate: Date;
-  interviewTime: string;
+  interviewDate: Date | null | undefined;
+  interviewTime: string | undefined | null;
   mode: string;
   aiCoach?: AiCoachType | null;
 };

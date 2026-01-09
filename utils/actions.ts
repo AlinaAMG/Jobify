@@ -14,7 +14,7 @@ import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
 import { callAI } from './ai-service';
 import { revalidatePath } from 'next/cache';
-import { type AiAnalysisResult } from './types';
+
 
 export const analyzeJobAndCvWithGemini = async (
   description: string,
