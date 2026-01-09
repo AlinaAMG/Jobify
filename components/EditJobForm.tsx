@@ -37,22 +37,38 @@ function EditJobForm({ jobId }: { jobId: string }) {
   const { mutate, isPending } = useMutation({
     mutationFn: (values: CreateAndEditJobType) =>
       updateJobAction(jobId, values),
-    onSuccess: (data) => {
+    onSuccess: (data, values) => {
       if (!data) {
         toast.error('Er is iets misgegaan');
         return;
       }
-      toast.success(
-        'Wijzigingen opgeslagen! Start nu een nieuwe AI-analyse voor deze aangepaste tekst.',
-        {
-          duration: 5000,
-          icon: '✨',
-        }
-      );
+
+      // 1. Controleer of de cruciale AI-velden zijn aangepast
+      // We vergelijken de nieuwe waarden (values) met de originele (job)
+      const isAiContentChanged =
+        values.position !== data?.position ||
+        values.company !== data?.company ||
+        values.description !== data?.description;
+
+      toast.success('Wijzigingen opgeslagen!', { duration: 3000 });
+
+      // 2.Refresh de data
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
       queryClient.invalidateQueries({ queryKey: ['job', jobId] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
-      router.push(`/ai-coach/${jobId}`);
+
+      // 3. De juiste routering
+      if (isAiContentChanged) {
+        // Alleen naar AI-coach als de omschrijving veld, functietitel of bedrijfsnaam echt veranderd is
+        toast.success(
+          'Start nu een nieuwe AI-analyse voor de aangepaste tekst.',
+          { icon: '✨' }
+        );
+        router.push(`/ai-coach/${jobId}`);
+      } else {
+        // Als alleen de status/tijd is aangepast, gaan we gewoon terug naar de vacatures pagina
+        router.push('/jobs');
+      }
     },
   });
 
@@ -122,6 +138,7 @@ function EditJobForm({ jobId }: { jobId: string }) {
               />
             </div>
           )}
+
           <div className=" grid col-span-2 lg:col-span-3">
             <CustomFormTextarea
               name="description"

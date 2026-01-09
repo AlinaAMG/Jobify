@@ -7,7 +7,6 @@ import {
   CreateAndEditJobType,
   createAndEditJobSchema,
   GetAllJobsActionTypes,
-  Profile,
 } from './types';
 import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';

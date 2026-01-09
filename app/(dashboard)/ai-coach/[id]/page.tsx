@@ -12,8 +12,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, FileText } from 'lucide-react';
-import GenerateLetterBtn from '@/components/ai-coach-data/GenerateLetterBtn';
+import { ArrowLeft } from 'lucide-react';
+
 import CardBtn from '@/components/ai-coach-data/CardBtn';
 import MissieStrategy from '@/components/ai-coach-data/MissieStrategy';
 import Skills from '@/components/ai-coach-data/Skills';
