@@ -6,7 +6,8 @@ type StrategyProps = {
     interviewTip: string;
 }
 
-const Strategy = ({ summary,interviewTip}:StrategyProps) => {
+const Strategy = ({ summary, interviewTip }: StrategyProps) => {
+  console.log(summary, interviewTip);
   return (
     <div className="grid md:grid-cols-2 gap-3">
       <Card>

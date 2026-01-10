@@ -4,10 +4,10 @@ import AiCoachForm from '@/components/ai-coach/AiCoachForm';
 import AiCoachResult from '@/components/ai-coach/AiCoachResult';
 import AiCoachSkeleton from '@/components/ai-coach/AiCoachSkeleton';
 import {
+  generateCoverLetterWithGemini,
   getProfileAction,
   getSingleJobAction,
   startAiAnalysisAction,
-  updateProfileAction,
 } from '@/utils/actions';
 import {
   AiAnalysisResult,
@@ -23,7 +23,9 @@ import { toast } from 'sonner';
 
 const AiCoachPage = () => {
   const [isPending, startTransition] = useTransition();
+  const [isLetterPending, startLetterTransition] = useTransition();
   const [result, setResult] = useState<AiAnalysisResult | null>(null);
+
   const searchParams = useSearchParams();
   const jobId = searchParams.get('id');
   const router = useRouter();
@@ -54,7 +56,7 @@ const AiCoachPage = () => {
 
     loadData();
   }, [jobId]);
-  
+
   const handleSubmit = (values: AiCoachFormValues) => {
     startTransition(async () => {
       try {
@@ -69,22 +71,52 @@ const AiCoachPage = () => {
           if (jobId) {
             // Met ID: Stuur door naar de database-pagina
             router.push(`/ai-coach/${jobId}`);
-            form.reset({
-              resume: '',
-              description: '',
-            });
           } else {
+            console.log('RAUWE DATA VAN ACTION:', data);
             // ZONDER ID: Update de state die je al hebt!
-            setResult(data as AiAnalysisResult);
+            const cleanData = (data as any).data ? (data as any).data : data;
+            // setResult(data as AiAnalysisResult);
+            setResult({
+              ...cleanData,
+              // Forceer deze velden naar boven als ze diep in een object zitten
+              strategy: cleanData.strategy || cleanData.aiCoach?.strategy,
+              mission: cleanData.mission || cleanData.aiCoach?.mission,
+            } as AiAnalysisResult);
             toast.success('Analyse voltooid!');
-            form.reset({
-              resume: '',
-              description: '',
-            });
           }
         }
       } catch (error) {
         toast.error('Er ging iets mis tijdens de analyse.');
+      }
+    });
+  };
+
+  const handleGenerateLetter = () => {
+    const currentDescription = form.getValues('description');
+
+    if (!currentDescription || currentDescription.trim() === '') {
+      toast.error('Voer eerst een vacature tekst in');
+      return; // Stop de functie hier!
+    }
+
+    // Gebruik de SPECIFIEKE transition voor de brief
+    startLetterTransition(async () => {
+      try {
+        const response = await generateCoverLetterWithGemini(
+          currentDescription,
+          result?.skills || []
+        );
+
+        // Zorg dat we ALTIJD een string opslaan, ook als 'response' een object is
+        const briefText =
+          typeof response === 'object' ? response.coverLetter : response;
+
+        setResult((prev) =>
+          prev ? { ...prev, coverLetter: briefText } : null
+        );
+        toast.success('Brief succesvol geschreven!');
+      } catch (error) {
+        toast.error('Er ging iets mis bij het schrijven van de brief.');
       }
     });
   };
@@ -111,7 +143,13 @@ const AiCoachPage = () => {
 
       <section className="min-h-[400px]">
         {isPending && <AiCoachSkeleton />}
-        {!isPending && result && <AiCoachResult data={result} />}
+        {!isPending && result && (
+          <AiCoachResult
+            data={result}
+            onGenerate={handleGenerateLetter}
+            isPending={isLetterPending}
+          />
+        )}
         {!isPending && !result && (
           <div className="h-full min-h-[250px] flex items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center text-muted-foreground">
             <p>Klik op de knop om de analyse te starten...</p>

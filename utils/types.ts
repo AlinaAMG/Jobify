@@ -1,5 +1,5 @@
+import { Prisma } from '@prisma/client';
 import * as z from 'zod';
-
 
 export type JobType = {
   id: string;
@@ -19,12 +19,12 @@ export type JobType = {
 
 export type AiCoachType = {
   id: string;
-  matchingScore: number;
+  matchScore: number;
   mission: string;
   company?: string;
   strategy: string;
-  missingSkills: string;
-  matchingSkills: string;
+  missingSkills: string[] | string;
+  matchingSkills: string[] | string;
   coverLetter?: string | null;
 };
 
@@ -75,8 +75,8 @@ export type GetAllJobsActionTypes = {
 
 export type AiAnalysisResult = {
   skills: string[];
-  summary: string;
-  interviewTip: string;
+  strategy: string;
+  mission: string;
   coverLetter: string;
   matchScore: number;
   resume: string;
@@ -93,3 +93,7 @@ export const AiCoachFormSchema = z.object({
   }),
 });
 export type AiCoachFormValues = z.infer<typeof AiCoachFormSchema>;
+
+export type JobWithAiCoach = Prisma.JobGetPayload<{
+  include: { aiCoach: true };
+}>;

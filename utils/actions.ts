@@ -8,6 +8,7 @@ import {
   createAndEditJobSchema,
   GetAllJobsActionTypes,
   AiAnalysisResult,
+  JobWithAiCoach,
 } from './types';
 import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
@@ -46,27 +47,48 @@ Geef een JSON object terug met:
     { role: 'user', content: prompt },
   ]);
 };
-
 export const generateCoverLetterWithGemini = async (
   description: string,
   skills: string[]
 ) => {
   const prompt = `Schrijf een professionele en overtuigende sollicitatiebrief voor de volgende vacature: "${description}". 
     Focus specifiek op deze vaardigheden: ${skills.join(', ')}. 
-    
-    GEEF JSON TERUG: { "coverLetter": "de volledige tekst van de brief" }.
-    
-    BELANGRIJK: De brief moet in foutloos Nederlands geschreven zijn, met een professionele maar enthousiaste toon.`;
 
-  return await callAI('google/gemini-2.0-flash-001', [
-    {
-      role: 'system',
-      content: 'Je bent een professionele copywriter. Antwoord in JSON.',
-    },
-    { role: 'user', content: prompt },
-  ]);
+    GEEF UITSLUITEND JSON TERUG: 
+    { 
+      "coverLetter": "De volledige tekst van de brief. Gebruik \\n voor nieuwe regels." 
+    }
+
+    RICHTLIJNEN:
+    - Gebruik een professionele maar enthousiaste toon.
+    - Zorg dat de brief in foutloos Nederlands is.
+    - Ontwijk het gebruik van echte enters in de JSON-waarde; gebruik alleen \\n.`;
+
+  try {
+    const result = await callAI('google/gemini-2.0-flash-001', [
+      {
+        role: 'system',
+        content:
+          'Je bent een professionele AI-carrièrecoach die uitsluitend valide JSON objecten genereert. Gebruik NOOIT markdown code blocks of gewone tekst.',
+      },
+      { role: 'user', content: prompt },
+    ]);
+
+    // Extra veiligheid: Controleer of het veld bestaat
+    if (!result || !result.coverLetter) {
+      throw new Error('Geen brief ontvangen van AI');
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Fout in generateCoverLetter:', error);
+    // Geef een fallback terug zodat de UI niet crasht
+    return {
+      coverLetter:
+        'Er is een fout opgetreden bij het genereren van de brief. Probeer het opnieuw.',
+    };
+  }
 };
-
 export async function ChatAssistantWithGeminiAction(
   history: { role: string; content: string }[],
   userInput: string
@@ -186,38 +208,40 @@ export const startAiAnalysisAction = async (
         },
       });
       revalidatePath(`/ai-coach/${jobId}`);
+      revalidatePath('/ai-coach');
 
       // BELANGRIJK: Map de database namen naar jouw AiAnalysisResult namen
       return {
         matchScore: aiRecord.matchingScore,
-        summary: aiRecord.strategy,
-        interviewTip: aiRecord.mission,
-        matchingSkills: aiRecord.matchingSkills
-          ? aiRecord.matchingSkills.split(', ')
-          : [],
-        missingSkills: aiRecord.missingSkills
-          ? aiRecord.missingSkills.split(', ')
-          : [],
-        skills: aiRecord.matchingSkills
-          ? aiRecord.matchingSkills.split(', ')
-          : [],
+        strategy: aiRecord.strategy,
+        mission: aiRecord.mission,
+        // FIX: Zet de string uit de DB altijd om naar een Array voor de UI
+        matchingSkills:
+          typeof aiRecord.matchingSkills === 'string'
+            ? aiRecord.matchingSkills.split(', ').filter(Boolean)
+            : [],
+        missingSkills:
+          typeof aiRecord.missingSkills === 'string'
+            ? aiRecord.missingSkills.split(', ').filter(Boolean)
+            : [],
+        skills:
+          typeof aiRecord.matchingSkills === 'string'
+            ? aiRecord.matchingSkills.split(', ').filter(Boolean)
+            : [],
         coverLetter: aiRecord.coverLetter || '',
         resume: resumeText,
       } as AiAnalysisResult;
     }
 
-    // STAP 4: Geen jobId? Geef de data direct terug in het juiste formaat
+    // STAP 4: Geen jobId? (Handmatige versie)
+
     return {
       matchScore: data.matchScore,
-      summary: data.summary,
-      interviewTip: data.interviewTip,
-      matchingSkills: Array.isArray(data.matchingSkills)
-        ? data.matchingSkills
-        : [],
-      missingSkills: Array.isArray(data.missingSkills)
-        ? data.missingSkills
-        : [],
-      skills: Array.isArray(data.matchingSkills) ? data.matchingSkills : [],
+      strategy: data.summary || data.strategy,
+      mission: data.interviewTip || data.mission,
+      matchingSkills: data.matchingSkills || [],
+      missingSkills: data.missingSkills || [],
+      skills: data.matchingSkills || [], // Zorg dat skills gevuld is
       coverLetter: data.coverLetter || '',
       resume: resumeText,
     } as AiAnalysisResult;
@@ -419,11 +443,10 @@ export const deleteJobAction = async (id: string): Promise<JobType | null> => {
 
 export const getSingleJobAction = async (
   id: string
-): Promise<JobType | null> => {
-  let job: JobType | null = null;
+): Promise<JobWithAiCoach | null> => {
   const userId = authenticateAndRedirect();
   try {
-    job = await prisma.job.findUnique({
+    const job = await prisma.job.findUnique({
       where: {
         id,
         clerkId: userId,
@@ -432,13 +455,18 @@ export const getSingleJobAction = async (
         aiCoach: true,
       },
     });
+    if (!job) {
+      redirect('/jobs');
+    }
+
+    return job as JobWithAiCoach;
   } catch (error) {
-    job = null;
-  }
-  if (!job) {
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT')
+      throw error;
+
     redirect('/jobs');
+    return null;
   }
-  return job;
 };
 
 export const updateJobAction = async (

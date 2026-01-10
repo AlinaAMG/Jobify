@@ -2,10 +2,11 @@ import { CheckCircle2, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 
-interface SkillsJobProps {
+type SkillsJobProps = {
   skills?: string[];
-}
+};
 const SkillsJob = ({ skills }: SkillsJobProps) => {
+  const hasSkills = skills && skills.length > 0;
 
   return (
     <Card>
@@ -16,7 +17,7 @@ const SkillsJob = ({ skills }: SkillsJobProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-2">
-        {skills &&
+        {hasSkills &&
           skills?.map((skill, index) => (
             <Badge
               variant="secondary"

@@ -16,42 +16,71 @@ import CoverLetter from '@/components/ai-coach-data/CoverLetter';
 const GenerateAiResultPage = async ({ params }: { params: { id: string } }) => {
   const { id } = params;
 
-  // Initialiseer job als null
+  // 1. Data ophalen
   let job = null;
-  // Alleen data ophalen als er een id is
   if (id && id !== 'result') {
     job = await getSingleJobAction(id);
   }
 
-  if (!job && id) {
+  // 2. Als de job echt niet bestaat in de database
+  if (!job && id !== 'result') {
     redirect('/jobs');
   }
 
-  // 4. Als er geen job is EN geen id, tonen we een lege staat of een formulier
+  // 3. Situatie A: Er is GEEN job data (bijv. route is /ai-coach/result)
+  // Toon het start-formulier
   if (!job) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh]">
-        <p>Geen gegevens gevonden. Plak eerst je CV en vacature.</p>
+      <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
+        <p>Plak eerst je CV en vacature om een analyse te starten.</p>
         <Button asChild>
           <Link href="/ai-coach">Ga naar invoer</Link>
         </Button>
       </div>
     );
   }
-  const analysis = job.aiCoach;
 
-  if (!analysis) {
+  // 4. Situatie B: De job bestaat, maar er is nog GEEN AI-analyse gedaan
+  // Toon de knop om de analyse nu uit te voeren
+  if (!job.aiCoach) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh]">
+      <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
+        <h2 className="text-xl font-semibold">
+          Vacature gevonden: {job.position}
+        </h2>
+        <p className="text-muted-foreground">
+          Er is nog geen AI-analyse beschikbaar voor deze job.
+        </p>
         <CardBtn job={job} />
       </div>
     );
   }
 
+  // 5. Situatie C: De job EN de analyse bestaan.
+  // Nu bouwen we het analysis object veilig op.
+  const analysis = {
+    id: job.aiCoach.id,
+    mission: job.aiCoach.mission,
+    strategy: job.aiCoach.strategy,
+    matchScore: job.aiCoach.matchingScore ?? 0,
+    summary: job.aiCoach.strategy,
+    interviewTip: job.aiCoach.mission,
+    coverLetter: job.aiCoach.coverLetter || '',
+    matchingSkills: job.aiCoach.matchingSkills
+      ? job.aiCoach.matchingSkills.split(', ')
+      : [],
+    missingSkills: job.aiCoach.missingSkills
+      ? job.aiCoach.missingSkills.split(', ')
+      : [],
+    skills: job.aiCoach.matchingSkills
+      ? job.aiCoach.matchingSkills.split(', ')
+      : [],
+  };
+
   let badgeColor = 'bg-red-600';
-  if (analysis.matchingScore >= 80) {
+  if (analysis.matchScore >= 80) {
     badgeColor = 'bg-green-600';
-  } else if (analysis.matchingScore >= 50) {
+  } else if (analysis.matchScore >= 50) {
     badgeColor = 'bg-orange-500';
   }
 
@@ -67,7 +96,7 @@ const GenerateAiResultPage = async ({ params }: { params: { id: string } }) => {
         <Badge
           className={`text-xl px-4 py-1 text-white border-none ${badgeColor}`}
         >
-          {analysis.matchingScore}% Match Score
+          {analysis.matchScore}% Match Score
         </Badge>
       </div>
       <div className="grid gap-6">
