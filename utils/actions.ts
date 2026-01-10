@@ -7,13 +7,13 @@ import {
   CreateAndEditJobType,
   createAndEditJobSchema,
   GetAllJobsActionTypes,
+  AiAnalysisResult,
 } from './types';
 import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
 import { callAI } from './ai-service';
 import { revalidatePath } from 'next/cache';
-
 
 export const analyzeJobAndCvWithGemini = async (
   description: string,
@@ -126,52 +126,101 @@ export async function ChatAssistantWithGeminiAction(
   }
 }
 export const startAiAnalysisAction = async (
-  jobId: string,
-  resumeText: string
+  jobId: string | null,
+  resumeText: string,
+  manualJobDescription?: string
 ) => {
   const userId = authenticateAndRedirect();
-
   try {
-    const job = await prisma.job.findFirst({
-      where: { id: jobId, clerkId: userId },
-    });
-    if (!job) throw new Error('Job niet gevonden');
+    let descriptionToAnalyze = '';
 
-    // Alleen de analyse (match score, skills, etc.)
+    // STAP 1: Bepaal welke vacaturetekst we gebruiken
+    if (jobId) {
+      const job = await prisma.job.findFirst({
+        where: {
+          id: jobId,
+          clerkId: userId,
+        },
+      });
+
+      if (!job) throw new Error('Job niet gevonden');
+      descriptionToAnalyze = job.description;
+    } else if (manualJobDescription) {
+      descriptionToAnalyze = manualJobDescription;
+    } else {
+      throw new Error('Geen vacaturetekst beschikbaar voor analyse');
+    }
+
+    // STAP 2: Voer de AI analyse uit
     const analysis = await analyzeJobAndCvWithGemini(
-      job.description,
+      descriptionToAnalyze,
       resumeText
     );
     const data = typeof analysis === 'string' ? JSON.parse(analysis) : analysis;
 
-    const aiRecord = await prisma.aiCoach.upsert({
-      where: { jobId },
-      update: {
-        matchingScore: data.matchScore,
-        strategy: data.summary,
-        mission: data.interviewTip,
-        matchingSkills: Array.isArray(data.matchingSkills)
-          ? data.matchingSkills.join(', ')
-          : data.matchingSkills,
-        missingSkills: Array.isArray(data.missingSkills)
-          ? data.missingSkills.join(', ')
-          : data.missingSkills,
-      },
-      create: {
-        jobId,
-        matchingScore: data.matchScore,
-        strategy: data.summary,
-        mission: data.interviewTip,
-        matchingSkills: Array.isArray(data.matchingSkills)
-          ? data.matchingSkills.join(', ')
-          : data.matchingSkills,
-        missingSkills: Array.isArray(data.missingSkills)
-          ? data.missingSkills.join(', ')
-          : data.missingSkills,
-      },
-    });
+    if (jobId) {
+      const aiRecord = await prisma.aiCoach.upsert({
+        where: { jobId },
+        update: {
+          matchingScore: data.matchScore,
+          strategy: data.summary, // DB naam is strategy
+          mission: data.interviewTip, // DB naam is mission
+          matchingSkills: Array.isArray(data.matchingSkills)
+            ? data.matchingSkills.join(', ')
+            : data.matchingSkills,
+          missingSkills: Array.isArray(data.missingSkills)
+            ? data.missingSkills.join(', ')
+            : data.missingSkills,
+        },
+        create: {
+          jobId,
+          matchingScore: data.matchScore,
+          strategy: data.summary,
+          mission: data.interviewTip,
+          matchingSkills: Array.isArray(data.matchingSkills)
+            ? data.matchingSkills.join(', ')
+            : data.matchingSkills,
+          missingSkills: Array.isArray(data.missingSkills)
+            ? data.missingSkills.join(', ')
+            : data.missingSkills,
+        },
+      });
+      revalidatePath(`/ai-coach/${jobId}`);
 
-    return aiRecord;
+      // BELANGRIJK: Map de database namen naar jouw AiAnalysisResult namen
+      return {
+        matchScore: aiRecord.matchingScore,
+        summary: aiRecord.strategy,
+        interviewTip: aiRecord.mission,
+        matchingSkills: aiRecord.matchingSkills
+          ? aiRecord.matchingSkills.split(', ')
+          : [],
+        missingSkills: aiRecord.missingSkills
+          ? aiRecord.missingSkills.split(', ')
+          : [],
+        skills: aiRecord.matchingSkills
+          ? aiRecord.matchingSkills.split(', ')
+          : [],
+        coverLetter: aiRecord.coverLetter || '',
+        resume: resumeText,
+      } as AiAnalysisResult;
+    }
+
+    // STAP 4: Geen jobId? Geef de data direct terug in het juiste formaat
+    return {
+      matchScore: data.matchScore,
+      summary: data.summary,
+      interviewTip: data.interviewTip,
+      matchingSkills: Array.isArray(data.matchingSkills)
+        ? data.matchingSkills
+        : [],
+      missingSkills: Array.isArray(data.missingSkills)
+        ? data.missingSkills
+        : [],
+      skills: Array.isArray(data.matchingSkills) ? data.matchingSkills : [],
+      coverLetter: data.coverLetter || '',
+      resume: resumeText,
+    } as AiAnalysisResult;
   } catch (error) {
     console.error(error);
     return null;

@@ -54,27 +54,40 @@ const AiCoachPage = () => {
 
     loadData();
   }, [jobId]);
-
+  
   const handleSubmit = (values: AiCoachFormValues) => {
     startTransition(async () => {
       try {
-        // STAP 1: Stuur je persoonlijke CV tekst naar de backend
-        await updateProfileAction(values.resume);
+        // Roep de actie aan met de handmatige jobDescription
+        const data = await startAiAnalysisAction(
+          jobId || null,
+          values.resume,
+          values.description
+        );
 
-        // STAP 2: Voer de AI analyse uit met diezelfde persoonlijke tekst
-        if (jobId) {
-          const data = await startAiAnalysisAction(jobId, values.resume);
-          if (data) {
-            toast.success('Je persoonlijke CV is opgeslagen en geanalyseerd!');
+        if (data) {
+          if (jobId) {
+            // Met ID: Stuur door naar de database-pagina
             router.push(`/ai-coach/${jobId}`);
+            form.reset({
+              resume: '',
+              description: '',
+            });
+          } else {
+            // ZONDER ID: Update de state die je al hebt!
+            setResult(data as AiAnalysisResult);
+            toast.success('Analyse voltooid!');
+            form.reset({
+              resume: '',
+              description: '',
+            });
           }
         }
       } catch (error) {
-        toast.error('Er ging iets mis bij het opslaan van je CV.');
+        toast.error('Er ging iets mis tijdens de analyse.');
       }
     });
   };
-
   return (
     <div className="mx-auto p-4 sm:p-8 space-y-10 bg-muted rounded">
       <section>

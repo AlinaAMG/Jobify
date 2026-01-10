@@ -1,16 +1,9 @@
 import { getSingleJobAction } from '@/utils/actions';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft } from 'lucide-react';
 
@@ -22,12 +15,29 @@ import CoverLetter from '@/components/ai-coach-data/CoverLetter';
 
 const GenerateAiResultPage = async ({ params }: { params: { id: string } }) => {
   const { id } = params;
-  const job = await getSingleJobAction(id);
 
-  if (!job) {
+  // Initialiseer job als null
+  let job = null;
+  // Alleen data ophalen als er een id is
+  if (id && id !== 'result') {
+    job = await getSingleJobAction(id);
+  }
+
+  if (!job && id) {
     redirect('/jobs');
   }
 
+  // 4. Als er geen job is EN geen id, tonen we een lege staat of een formulier
+  if (!job) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh]">
+        <p>Geen gegevens gevonden. Plak eerst je CV en vacature.</p>
+        <Button asChild>
+          <Link href="/ai-coach">Ga naar invoer</Link>
+        </Button>
+      </div>
+    );
+  }
   const analysis = job.aiCoach;
 
   if (!analysis) {
