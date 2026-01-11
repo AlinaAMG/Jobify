@@ -347,7 +347,6 @@ export const getProfileAction = async () => {
 };
 
 export const updateProfileAction = async (resumeText: string) => {
-  console.log('UPDATE PROFILE START:', resumeText.substring(0, 20)); // Zie je dit in je terminal?
   const { userId } = auth();
   if (!userId) throw new Error('Niet ingelogd');
 
@@ -440,14 +439,18 @@ export const getAllJobsAction = async ({
         },
 
         {
-          aiCoach: {
-            matchingScore: 'asc',
-          },
-        },
-        {
           createdAt: 'desc',
         },
       ],
+    });
+    // 2. Sorteer de array
+    // We willen: Hoogste score eerst, banen zonder score daarna
+    const sortedJobs = jobs.sort((a, b) => {
+      const scoreA = a.aiCoach?.matchingScore ?? -1; // -1 als er geen score is
+      const scoreB = b.aiCoach?.matchingScore ?? -1;
+
+      // Sorteer van hoog naar laag
+      return scoreB - scoreA;
     });
 
     const count: number = await prisma.job.count({
@@ -455,7 +458,7 @@ export const getAllJobsAction = async ({
     });
     const totalPages = Math.ceil(count / limit);
     return {
-      jobs: jobs as JobWithAiCoach[],
+      jobs: sortedJobs as JobWithAiCoach[],
       count,
       page,
       totalPages,
