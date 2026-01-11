@@ -8,6 +8,7 @@ import {
   getProfileAction,
   getSingleJobAction,
   startAiAnalysisAction,
+  updateProfileAction,
 } from '@/utils/actions';
 import {
   AiAnalysisResult,
@@ -60,7 +61,10 @@ const AiCoachPage = () => {
   const handleSubmit = (values: AiCoachFormValues) => {
     startTransition(async () => {
       try {
-        // Roep de actie aan met de handmatige jobDescription
+        //  Sla het CV direct op in de database
+        await updateProfileAction(values.resume);
+        console.log('CV succesvol bijgewerkt in de database');
+
         const data = await startAiAnalysisAction(
           jobId || null,
           values.resume,

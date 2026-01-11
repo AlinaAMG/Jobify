@@ -24,10 +24,13 @@ toast;
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Calendar24 } from './Calendar';
+import { useEffect, useRef, useState } from 'react';
 
 function EditJobForm({ jobId }: { jobId: string }) {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const hasLoadedData = useRef(false);
 
   const { data } = useQuery({
     queryKey: ['job', jobId],
@@ -37,36 +40,34 @@ function EditJobForm({ jobId }: { jobId: string }) {
   const { mutate, isPending } = useMutation({
     mutationFn: (values: CreateAndEditJobType) =>
       updateJobAction(jobId, values),
-    onSuccess: (data, values) => {
-      if (!data) {
+    onSuccess: (updatedData, values) => {
+      if (!updatedData) {
         toast.error('Er is iets misgegaan');
         return;
       }
 
-      // 1. Controleer of de cruciale AI-velden zijn aangepast
-      // We vergelijken de nieuwe waarden (values) met de originele (job)
+      // 1. Controleer wijziging (vergelijk values met de data van de query)
       const isAiContentChanged =
         values.position !== data?.position ||
         values.company !== data?.company ||
         values.description !== data?.description;
 
-      toast.success('Wijzigingen opgeslagen!', { duration: 3000 });
-
-      // 2.Refresh de data
+      // 2. Cache direct updaten (voorkomt flikkering)
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
       queryClient.invalidateQueries({ queryKey: ['job', jobId] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
 
-      // 3. De juiste routering
+      // 3. Routering + Gecombineerde Toast
       if (isAiContentChanged) {
-        // Alleen naar AI-coach als de omschrijving veld, functietitel of bedrijfsnaam echt veranderd is
-        toast.success(
-          'Start nu een nieuwe AI-analyse voor de aangepaste tekst.',
-          { icon: '✨' }
-        );
+        // We sturen ze direct door met een specifieke boodschap
+        toast.success('Inhoud aangepast! Start een nieuwe AI-analyse.', {
+          icon: '✨',
+          duration: 4000,
+        });
         router.push(`/ai-coach/${jobId}`);
       } else {
-        // Als alleen de status/tijd is aangepast, gaan we gewoon terug naar de vacatures pagina
+        // Alleen status/locatie etc. aangepast
+        toast.success('Wijzigingen succesvol opgeslagen');
         router.push('/jobs');
       }
     },
@@ -88,6 +89,20 @@ function EditJobForm({ jobId }: { jobId: string }) {
       description: data?.description || '',
     },
   });
+
+  useEffect(() => {
+    if (data && isFirstLoad) {
+      form.reset({
+        ...data,
+        status: data.status as JobStatus,
+        mode: data.mode as JobMode,
+        interviewDate: data.interviewDate
+          ? new Date(data.interviewDate)
+          : undefined,
+      });
+      setIsFirstLoad(false); // Zorg dat dit niet meer opnieuw gebeurt
+    }
+  }, [data, form, isFirstLoad]);
 
   // 2. Define a submit handler.
   function onSubmit(values: CreateAndEditJobType) {

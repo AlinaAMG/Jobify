@@ -149,14 +149,31 @@ export async function ChatAssistantWithGeminiAction(
 }
 export const startAiAnalysisAction = async (
   jobId: string | null,
-  resumeText: string,
+  resumeText?: string,
   manualJobDescription?: string
 ) => {
   const userId = authenticateAndRedirect();
   try {
+    // 1. CV Bepalen
+    let finalResumeText = '';
+
+    if (resumeText && resumeText.trim().length > 0) {
+      // SCENARIO B: Er is handmatig een CV meegegeven in het tekstveld
+      finalResumeText = resumeText;
+    } else {
+      // STAP 1. Geen handmatig CV, dus haal de standaard uit de database
+      const userProfile = await prisma.profile.findUnique({
+        where: { clerkId: userId },
+      });
+
+      if (!userProfile?.resume) {
+        throw new Error('Geen CV gevonden in database en geen CV geplakt.');
+      }
+      finalResumeText = userProfile.resume;
+    }
+    // STAP 2: Bepaal welke vacaturetekst we gebruiken
     let descriptionToAnalyze = '';
 
-    // STAP 1: Bepaal welke vacaturetekst we gebruiken
     if (jobId) {
       const job = await prisma.job.findFirst({
         where: {
@@ -176,7 +193,7 @@ export const startAiAnalysisAction = async (
     // STAP 2: Voer de AI analyse uit
     const analysis = await analyzeJobAndCvWithGemini(
       descriptionToAnalyze,
-      resumeText
+      finalResumeText
     );
     const data = typeof analysis === 'string' ? JSON.parse(analysis) : analysis;
 
@@ -230,7 +247,7 @@ export const startAiAnalysisAction = async (
             ? aiRecord.matchingSkills.split(', ').filter(Boolean)
             : [],
         coverLetter: aiRecord.coverLetter || '',
-        resume: resumeText,
+        resume: finalResumeText,
       } as AiAnalysisResult;
     }
 
@@ -242,9 +259,9 @@ export const startAiAnalysisAction = async (
       mission: data.interviewTip || data.mission,
       matchingSkills: data.matchingSkills || [],
       missingSkills: data.missingSkills || [],
-      skills: data.matchingSkills || [], // Zorg dat skills gevuld is
+      skills: data.matchingSkills || [],
       coverLetter: data.coverLetter || '',
-      resume: resumeText,
+      resume: finalResumeText,
     } as AiAnalysisResult;
   } catch (error) {
     console.error(error);
@@ -330,6 +347,7 @@ export const getProfileAction = async () => {
 };
 
 export const updateProfileAction = async (resumeText: string) => {
+  console.log('UPDATE PROFILE START:', resumeText.substring(0, 20)); // Zie je dit in je terminal?
   const { userId } = auth();
   if (!userId) throw new Error('Niet ingelogd');
 
@@ -338,7 +356,7 @@ export const updateProfileAction = async (resumeText: string) => {
     update: { resume: resumeText },
     create: { clerkId: userId, resume: resumeText },
   });
-
+  console.log('DATABASE OPSLAG GELUKT!');
   revalidatePath('/ai-coach');
   return profile;
 };
@@ -497,7 +515,18 @@ export const updateJobAction = async (
 ): Promise<JobType | null> => {
   const userId = authenticateAndRedirect();
   try {
-    // 1. Update de Job data (titel, omschrijving, etc.)
+    // 1. hall de huidige versie van de job op om te vergelijken
+    const currentJob = await prisma.job.findUnique({
+      where: {
+        id,
+        clerkId: userId,
+      },
+      select: {
+        position: true,
+        description: true,
+      },
+    });
+    // 2. Update de Job data (titel, omschrijving, etc.)
     const job: JobType = await prisma.job.update({
       where: {
         id,
@@ -507,13 +536,18 @@ export const updateJobAction = async (
         ...values,
       },
     });
-    // 2. Verwijder de AiCoach record die bij deze Job hoort
-
-    await prisma.aiCoach.deleteMany({
-      where: {
-        jobId: id,
-      },
-    });
+    // 3. Verwijder de AiCoach record die bij deze Job hoort
+    const hasContentChanged =
+      currentJob?.position !== values.position ||
+      currentJob?.description !== values.description;
+    if (hasContentChanged) {
+      await prisma.aiCoach.deleteMany({
+        where: {
+          jobId: id,
+        },
+      });
+      console.log('Inhoud gewijzigd: Oude AI-analyse verwijderd.');
+    }
 
     return job;
   } catch (error) {

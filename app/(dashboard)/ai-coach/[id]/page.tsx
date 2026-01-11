@@ -62,7 +62,7 @@ const GenerateAiResultPage = async ({ params }: { params: { id: string } }) => {
     id: job.aiCoach.id,
     mission: job.aiCoach.mission,
     strategy: job.aiCoach.strategy,
-    matchScore: job.aiCoach.matchingScore ?? 0,
+    matchingScore: job.aiCoach.matchingScore ?? 0,
     summary: job.aiCoach.strategy,
     interviewTip: job.aiCoach.mission,
     coverLetter: job.aiCoach.coverLetter || '',
@@ -78,9 +78,9 @@ const GenerateAiResultPage = async ({ params }: { params: { id: string } }) => {
   };
 
   let badgeColor = 'bg-red-600';
-  if (analysis.matchScore >= 80) {
+  if (analysis.matchingScore >= 80) {
     badgeColor = 'bg-green-600';
-  } else if (analysis.matchScore >= 50) {
+  } else if (analysis.matchingScore >= 50) {
     badgeColor = 'bg-orange-500';
   }
 
@@ -96,7 +96,7 @@ const GenerateAiResultPage = async ({ params }: { params: { id: string } }) => {
         <Badge
           className={`text-xl px-4 py-1 text-white border-none ${badgeColor}`}
         >
-          {analysis.matchScore}% Match Score
+          {analysis.matchingScore}% Match Score
         </Badge>
       </div>
       <div className="grid gap-6">
