@@ -22,20 +22,53 @@ import InterviewSection from './InterviewSection';
 
 const JobCard = ({ job }: { job: JobType }) => {
   const date = new Date(job.createdAt).toLocaleDateString();
+  const score = job.aiCoach?.matchingScore;
+  const status = job.status.toLowerCase();
+
+  // We laten de score zien alleen als de status niet "declined" is
+  const showScore =
+    typeof score === 'number' && !isNaN(score) && status !== 'declined';
 
   return (
     <Card className="bg-muted flex flex-col h-full min-h-[350px]">
       <CardHeader>
-        <CardTitle className="flex justify-between items-start">
-          {job.position}
+        <div className="flex justify-between items-start w-full">
+          {/* Linkerkant: Titel en Bedrijf */}
+          <div className="flex flex-col gap-1">
+            <CardTitle className="text-xl font-bold leading-tight">
+              {job.position}
+            </CardTitle>
+            <CardDescription className="text-base font-medium">
+              {job.company}
+            </CardDescription>
 
-          {job.aiCoach && (
-            <Badge variant="outline" className="text-primary border-primary">
-              <Sparkles className="w-3 h-3 mr-1" /> AI Ready
-            </Badge>
+            {/* AI Ready Badge onder de bedrijfsnaam */}
+            {job.aiCoach && (
+              <Badge
+                variant="outline"
+                className="w-fit text-primary border-primary mt-1"
+              >
+                <Sparkles className="w-3 h-3 mr-1" /> AI Ready
+              </Badge>
+            )}
+          </div>
+
+          {/* Rechterkant: De Match Score Cirkel */}
+          {showScore && (
+            <div
+              className={`flex flex-col items-center justify-center shrink-0 rounded-full w-14 h-14 border-2 shadow-sm ${
+                score > 75
+                  ? 'border-green-500 text-green-600 bg-green-50'
+                  : score > 50
+                  ? 'border-amber-500 text-amber-600 bg-amber-50'
+                  : 'border-red-500 text-red-600 bg-red-50'
+              }`}
+            >
+              <span className="text-sm font-black leading-none">{score}%</span>
+              <span className="text-[9px] uppercase font-bold">Match</span>
+            </div>
           )}
-        </CardTitle>
-        <CardDescription>{job.company}</CardDescription>
+        </div>
       </CardHeader>
 
       <Separator />

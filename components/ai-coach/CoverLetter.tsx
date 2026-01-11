@@ -11,7 +11,6 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 type CoverLetterProps = {
-  // We accepteren string of object om errors te voorkomen
   content?: string | { coverLetter: string };
   isPending: boolean;
   onGenerate: () => void;

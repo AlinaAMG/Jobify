@@ -207,12 +207,13 @@ export const startAiAnalysisAction = async (
             : data.missingSkills,
         },
       });
+      revalidatePath('/jobs');
       revalidatePath(`/ai-coach/${jobId}`);
       revalidatePath('/ai-coach');
 
       // BELANGRIJK: Map de database namen naar jouw AiAnalysisResult namen
       return {
-        matchScore: aiRecord.matchingScore,
+        matchingScore: aiRecord.matchingScore,
         strategy: aiRecord.strategy,
         mission: aiRecord.mission,
         // FIX: Zet de string uit de DB altijd om naar een Array voor de UI
@@ -236,7 +237,7 @@ export const startAiAnalysisAction = async (
     // STAP 4: Geen jobId? (Handmatige versie)
 
     return {
-      matchScore: data.matchScore,
+      matchingScore: data.matchingScore,
       strategy: data.summary || data.strategy,
       mission: data.interviewTip || data.mission,
       matchingSkills: data.matchingSkills || [],
@@ -366,10 +367,11 @@ export async function createJobAction(
 export const getAllJobsAction = async ({
   search,
   jobStatus,
+
   page = 1,
   limit = 10,
 }: GetAllJobsActionTypes): Promise<{
-  jobs: JobType[];
+  jobs: JobWithAiCoach[];
   count: number;
   page: number;
   totalPages: number;
@@ -407,19 +409,39 @@ export const getAllJobsAction = async ({
 
     const skip = (page - 1) * limit;
 
-    const jobs: JobType[] = await prisma.job.findMany({
+    const jobs = await prisma.job.findMany({
       where: whereClause,
       skip,
       take: limit,
-      orderBy: {
-        createdAt: 'desc',
+      include: {
+        aiCoach: true,
       },
+      orderBy: [
+        {
+          status: 'desc',
+        },
+
+        {
+          aiCoach: {
+            matchingScore: 'asc',
+          },
+        },
+        {
+          createdAt: 'desc',
+        },
+      ],
     });
+
     const count: number = await prisma.job.count({
       where: whereClause,
     });
     const totalPages = Math.ceil(count / limit);
-    return { jobs, count, page, totalPages };
+    return {
+      jobs: jobs as JobWithAiCoach[],
+      count,
+      page,
+      totalPages,
+    };
   } catch (error) {
     return { jobs: [], count: 0, page: 1, totalPages: 0 };
   }

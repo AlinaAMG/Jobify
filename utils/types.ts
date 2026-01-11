@@ -19,7 +19,7 @@ export type JobType = {
 
 export type AiCoachType = {
   id: string;
-  matchScore: number;
+  matchingScore: number;
   mission: string;
   company?: string;
   strategy: string;
@@ -78,7 +78,7 @@ export type AiAnalysisResult = {
   strategy: string;
   mission: string;
   coverLetter: string;
-  matchScore: number;
+  matchingScore: number;
   resume: string;
   matchingSkills: string[];
   missingSkills: string[];
