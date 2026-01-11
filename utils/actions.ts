@@ -16,6 +16,7 @@ import dayjs from 'dayjs';
 import { callAI } from './ai-service';
 import { revalidatePath } from 'next/cache';
 
+
 export const analyzeJobAndCvWithGemini = async (
   description: string,
   resume: string

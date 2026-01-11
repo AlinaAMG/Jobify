@@ -4,6 +4,7 @@ import AiCoachForm from '@/components/ai-coach/AiCoachForm';
 import AiCoachResult from '@/components/ai-coach/AiCoachResult';
 import AiCoachSkeleton from '@/components/ai-coach/AiCoachSkeleton';
 import {
+
   generateCoverLetterWithGemini,
   getProfileAction,
   getSingleJobAction,
@@ -21,6 +22,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import pdfToText from 'react-pdftotext';
 
 const AiCoachPage = () => {
   const [isPending, startTransition] = useTransition();
@@ -57,6 +59,29 @@ const AiCoachPage = () => {
 
     loadData();
   }, [jobId]);
+
+  const onFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      // Deze functie doet al het zware werk in de browser
+      const text = await pdfToText(file);
+
+      // Vul de tekst in je formulier
+      form.setValue('resume', text, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+
+      toast.success('CV succesvol ingeladen!');
+    } catch (error) {
+      console.error('Fout bij PDF lezen:', error);
+      toast.error(
+        'Kon de PDF niet lezen. Probeer een andere PDF of kopieer/plak de tekst.'
+      );
+    }
+  };
 
   const handleSubmit = (values: AiCoachFormValues) => {
     startTransition(async () => {
@@ -142,6 +167,7 @@ const AiCoachPage = () => {
           form={form}
           onSubmit={handleSubmit}
           isPending={isPending}
+          onFileUpload={onFileUpload}
         />
       </section>
 

@@ -3,14 +3,24 @@ import { Button } from '../ui/button';
 import { CustomFormTextarea } from '../FormComponents';
 import { AiCoachFormValues } from '@/utils/types';
 import { Form } from '../ui/form';
+import { useRef } from 'react';
+import UploadCv from './UploadCv';
 
 type AiCoachFormProps = {
   form: UseFormReturn<AiCoachFormValues>;
   onSubmit: (values: AiCoachFormValues) => void;
   isPending: boolean;
+  onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-const AiCoachForm = ({ onSubmit, form, isPending }: AiCoachFormProps) => {
+const AiCoachForm = ({
+  onSubmit,
+  form,
+  isPending,
+  onFileUpload,
+}: AiCoachFormProps) => {
+ 
+
   return (
     <Form {...form}>
       <form
@@ -33,6 +43,8 @@ const AiCoachForm = ({ onSubmit, form, isPending }: AiCoachFormProps) => {
           placeholder="Plak hier je eigen werkervaring of CV text..."
           heightClass="min-h-[400px]"
         />
+        <UploadCv onFileUpload={onFileUpload} />
+
         <Button
           type="submit"
           className="capitalize justify-self-center md:col-span-2 mt-4 dark:text-slate-200"
